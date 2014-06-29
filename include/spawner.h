@@ -14,4 +14,6 @@ typedef struct cell_ref {
 
 } cell_ref_t;
 
+void cell_registration(void);
+
 #endif /* _SPAWNER_H_ */

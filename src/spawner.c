@@ -5,7 +5,8 @@
 #include <dlist.h>
 
 void *spawn_pool = NULL;
-dlist_t head;
+
+dlist_t cell_ref_list;
 
 /*
  *
@@ -13,12 +14,14 @@ dlist_t head;
 static void
 init_pool(void)
 {
-    printf("[*] initialization\n");
+    cell_ref_t *cref;
+
+    printf("[*] %s\n", __FUNCTION__);
 
     spawn_pool = malloc(SPAWN_POOL_SIZE);
     assert(spawn_pool != NULL);
 
-    dlist_init(&head);
+    dlist_init(&cell_ref_list);
 }
 
 /*
@@ -27,16 +30,58 @@ init_pool(void)
 static void
 destroy_pool(void)
 {
-    printf("[*] destroying pool\n");
+    cell_ref_t      *cref = NULL;
+
+    printf("[*] %s\n", __FUNCTION__);
 
     free(spawn_pool);
+
+    while (!dlist_empty(&cell_ref_list)) {
+        cref = (cell_ref_t *) dlist_rm_back(&cell_ref_list);
+        assert(cref != NULL);
+
+        free(cref);
+    }
+}
+
+static void
+infect(void)
+{
+    printf("[*] %s\n", __FUNCTION__);
+
+}
+
+void
+cell_registration(void)
+{
+    printf("[*] %s\n", __FUNCTION__);
+}
+
+static void
+spawn_loop(void)
+{
+    dlist_t         *ptr;
+    cell_ref_t      *cref = NULL;
+
+    printf("[*] %s\n", __FUNCTION__);
+
+    for_each_dlist_ele(&cell_ref_list, ptr) {
+        cref = (cell_ref_t *) ptr;
+        assert(cref != NULL);
+
+        printf("[*] spawning cell : \n");
+    }
 }
 
 int main(int argc, char **argv)
 {
-    printf("[REPNMEM]\n");
+    printf("    [REPNMEM]\n\n");
 
     init_pool();
+
+    infect();
+
+    spawn_loop();
 
     destroy_pool();
 

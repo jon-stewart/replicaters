@@ -17,4 +17,7 @@ dlist_t *dlist_rm_front(dlist_t *);
 
 dlist_t *dlist_rm_back(dlist_t *);
 
+#define for_each_dlist_ele(head, ptr) \
+    for ((ptr) = (head)->next; (ptr) != (head); (ptr) = (ptr)->next)
+
 #endif
