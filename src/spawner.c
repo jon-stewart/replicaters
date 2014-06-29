@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <spawner.h>
+#include <dlist.h>
 
 void *spawn_pool = NULL;
+dlist_t head;
 
 /*
  *
@@ -15,6 +17,8 @@ init_pool(void)
 
     spawn_pool = malloc(SPAWN_POOL_SIZE);
     assert(spawn_pool != NULL);
+
+    dlist_init(&head);
 }
 
 /*
