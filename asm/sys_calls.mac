@@ -1,0 +1,168 @@
+;--------------------------------------------------------------------------------
+; sys_open
+; IN:
+;   filename, flags
+; RET:
+;   eax: less than zero error, first unused fd on success
+;
+%macro sys_open 2
+    mov eax, 0x5            ; sys_open
+    mov ebx, %1             ; filename
+    mov ecx, %2             ; flags
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_creat
+; IN:
+;   filename
+; RET:
+;   eax: less than zero failure, fd to file
+;
+%macro sys_creat 1
+    mov eax, 0x8            ; sys_creat
+    mov ebx, %1
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_read
+; IN:
+;   fd, buffer, length
+; RET:
+;   eax: # bytes read, zero is failure
+;
+%macro sys_read 3
+    mov eax, 0x3            ; sys_read
+    mov ebx, %1             ; fd
+    mov ecx, %2             ; buffer
+    mov edx, %3             ; length
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_lseek
+; IN:
+;   fd, offset, origin
+; RET:
+;   eax: # bytes from file beginning, -1 failure
+; DESCRIPTION:
+;   origin:
+;       SEEK_SET - offset from beginning + offset bytes
+;       SEEK_CUR - offset current location + offset bytes
+;       SEEK_END - offset to sizeof file + offset bytes
+;
+%macro sys_lseek 3
+    mov eax, 0x13
+    mov ebx, %1
+    mov ecx, %2
+    mov edx, %3
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_write
+; IN:
+;   fd, buffer, length
+; RET:
+;   eax: # bytes written, zero is failure
+;
+%macro sys_write 3
+    mov eax, 0x4            ; sys_write
+    mov ebx, %1             ; fd
+    mov ecx, %2             ; buffer
+    mov edx, %3             ; length
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_close
+; IN:
+;   fd
+; RET:
+;   eax: less than zero error.
+;
+%macro sys_close 1
+    mov eax, 0x6            ; sys_close
+    mov ebx, %1             ; fd
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_exit
+; IN:
+;   n/a
+; RET:
+;   n/a
+;
+%macro sys_exit 0
+    xor eax, eax
+    inc eax                 ; sys_exit
+    xor ebx, ebx            ; exit code
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_fstat
+; IN:
+;   fd
+; RET:
+;   eax: zero on success, -1 failure
+;   ebx: size of file
+;
+%macro sys_fstat 1
+    mov eax, 0x6c           ; sys_fstat
+    mov ebx, %1             ; fd
+    sub esp, 0x90           ; sizeof (struct stat)
+    mov ecx, esp            ; start of struct stat
+    int 0x80
+
+    mov ebx, [esp + 0x14]   ; st_size
+    add esp, 0x90
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_old_mmap
+; IN:
+;   addr, length, prot, flags, fd, pa_off
+; RET:
+;   eax: address
+;
+%macro sys_old_mmap 6
+    mov eax, 0x5a           ; sys_old_mmap
+    push %6                 ; pa_off
+    push dword %5           ; fd
+    push %4                 ; flags
+    push %3                 ; prot
+    push dword %2           ; length
+    push %1                 ; addr
+    mov ebx, esp            ; start of struct on stack
+    int 0x80
+    add esp, 24
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_munmap
+; IN:
+;   address, length
+; RET:
+;
+%macro sys_munmap 2
+    mov eax, 0x5b           ; sys_munmap
+    mov ebx, %1             ; address
+    mov ecx, %2             ; length
+    int 0x80
+%endmacro
+
+;--------------------------------------------------------------------------------
+; sys_ftruncate
+; IN:
+;   fd, length
+; RET:
+;   eax: zero is success, -1 failure
+%macro sys_ftruncate 2
+    mov eax, 0x5d           ; sys_ftruncate
+    mov ebx, %1             ; fd
+    mov ecx, %2             ; new file size
+    int 0x80
+%endmacro

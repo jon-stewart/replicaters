@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <spawner.h>
-#include <dlist.h>
 
 void *spawn_pool = NULL;
 
-dlist_t cell_ref_list;
+list_t cell_ref_list;
 
 /*
  *
@@ -14,14 +13,12 @@ dlist_t cell_ref_list;
 static void
 init_pool(void)
 {
-    cell_ref_t *cref;
-
     printf("[*] %s\n", __FUNCTION__);
 
     spawn_pool = malloc(SPAWN_POOL_SIZE);
     assert(spawn_pool != NULL);
 
-    dlist_init(&cell_ref_list);
+    list_init(&cell_ref_list);
 }
 
 /*
@@ -36,8 +33,8 @@ destroy_pool(void)
 
     free(spawn_pool);
 
-    while (!dlist_empty(&cell_ref_list)) {
-        cref = (cell_ref_t *) dlist_rm_back(&cell_ref_list);
+    while (!list_empty(&cell_ref_list)) {
+        cref = (cell_ref_t *) list_rm_back(&cell_ref_list);
         assert(cref != NULL);
 
         free(cref);
@@ -60,12 +57,12 @@ cell_registration(void)
 static void
 spawn_loop(void)
 {
-    dlist_t         *ptr;
+    list_t         *ptr;
     cell_ref_t      *cref = NULL;
 
     printf("[*] %s\n", __FUNCTION__);
 
-    for_each_dlist_ele(&cell_ref_list, ptr) {
+    for_each_list_ele(&cell_ref_list, ptr) {
         cref = (cell_ref_t *) ptr;
         assert(cref != NULL);
 
