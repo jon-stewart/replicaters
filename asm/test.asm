@@ -16,7 +16,7 @@ code:
     pop         edx
     sys_write   1, edx, 10          ; fd, buff, len
 
-    sys_exit
+    ret
 
 string:
 
