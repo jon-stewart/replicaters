@@ -45,7 +45,7 @@ destroy_pool(void)
 static unsigned
 get_shellcode(char **buf)
 {
-    FILE       *file = fopen("output.sc", "rb");
+    FILE       *file = fopen("/tmp/output.sc", "rb");
     unsigned    len;
 
 
@@ -54,7 +54,7 @@ get_shellcode(char **buf)
 
     fclose(file);
 
-    file = fopen("output.sc", "rb");
+    file = fopen("/tmp/output.sc", "rb");
 
     *buf = malloc(sizeof(char) * len);
 
