@@ -1,5 +1,11 @@
 ;------------------------------------------------------------------------------
-; test
+; Name:
+;   germ
+;
+; Description:
+;   Code which will scan for free space in memory and copy itself into it.
+;
+;   Ensure no NULL bytes in output machine code
 ;
 [section .text]
 
@@ -13,8 +19,8 @@ _start:
     jmp         short string
 code:
 
-    pop         edx                 ; address of string
-    sys_write   1, edx, str_len     ; fd, buff, len
+    pop         esi                 ; address of string
+    sys_write   1, esi, str_len     ; fd, buff, len
 
     ret
 
@@ -22,8 +28,8 @@ string:
 
     call        code
 str:
-    db          "Germ executing",10,0
+    db          "Germ executing",10
 str_len:        equ $-str
 
-len:            equ end - _start
+file_len:       equ end-_start
 end:

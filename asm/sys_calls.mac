@@ -68,10 +68,13 @@
 ;   eax: # bytes written, zero is failure
 ;
 %macro sys_write 3
-    mov eax, 0x4            ; sys_write
-    mov ebx, %1             ; fd
+    xor eax,eax
+    xor ebx,ebx
+    xor edx,edx
+    mov  al, 0x4            ; sys_write
+    mov  bl, %1             ; fd
     mov ecx, %2             ; buffer
-    mov edx, %3             ; length
+    mov  dl, %3             ; length
     int 0x80
 %endmacro
 
