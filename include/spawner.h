@@ -16,4 +16,6 @@ typedef struct cell_ref {
 
 void cell_registration(void);
 
+void infect(void);
+
 #endif /* _SPAWNER_H_ */

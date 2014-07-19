@@ -11,4 +11,4 @@ $target:
 	gcc $(c_opts) $(src) -o $(target)
 
 clean:
-	rm $(target)
+	-@rm $(target) 2>/dev/null || true

