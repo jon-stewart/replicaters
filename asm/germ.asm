@@ -13,7 +13,7 @@ _start:
     jmp         short string
 code:
 
-    pop         edx
+    pop         edx                 ; address of string
     sys_write   1, edx, 10          ; fd, buff, len
 
     ret

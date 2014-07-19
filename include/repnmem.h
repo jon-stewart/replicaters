@@ -11,7 +11,8 @@
 typedef struct germ {
     list_t         ls;
 
-    void           *address;
+    void (*entry)(void);
+
     unsigned int    magic;
     int             generation;
 
@@ -21,6 +22,7 @@ void init_spawn_pool(void);
 void destroy_spawn_pool(void);
 
 void froth(void);
+void add_scum(void *);
 void release_scum(void);
 
 void infect(void);
