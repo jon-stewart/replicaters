@@ -7,7 +7,10 @@ main(int argc, char **argv)
 
     infect();
 
-    froth();
+    int i;
+    for (i = 0; i < 5; ++i) {
+        froth();
+    }
 
     release_scum();
 

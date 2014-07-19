@@ -23,9 +23,9 @@ froth(void)
 
         germ->entry();
 
-        /* XXX temporary to test */
-        add_scum(germ->entry + length);
     }
+    /* XXX temporary to test */
+    add_scum(germ->entry + length);
 }
 
 void
