@@ -7,6 +7,7 @@
 #include <list.h>
 
 #define SPAWN_POOL_SIZE     (1 << 9)
+#define GERM_CODE           ("/tmp/output.sc")
 
 typedef struct germ {
     list_t         ls;

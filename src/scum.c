@@ -1,6 +1,9 @@
 #include <repnmem.h>
+#include <string.h>
 
 LIST(scum);
+
+extern void *spawn_pool;
 
 void
 froth(void)
@@ -22,13 +25,13 @@ froth(void)
 void
 infect(void)
 {
-    FILE       *file = NULL;
-    char       *buf  = NULL;
-    void       *addr = NULL;
-    unsigned    len  = 0;
+    FILE       *file    = NULL;
+    char       *buffer  = NULL;
+    void       *addr    = NULL;
+    unsigned    len     = 0;
 
 
-    file = fopen("/tmp/output.sc", "rb");
+    file = fopen(GERM_CODE, "rb");
 
     fseek(file, 0L, SEEK_END);
 
@@ -36,17 +39,17 @@ infect(void)
 
     fseek(file, 0L, SEEK_SET);
 
-    *buf = malloc(sizeof(char) * len);
+    buffer = malloc(sizeof(char) * len);
 
-    fread(*buf, len, len, file);
+    fread(buffer, len, len, file);
 
     fclose(file);
 
     addr = spawn_pool;
 
-    memcpy(addr, buf, len);
+    memcpy(addr, buffer, len);
 
-    free(buf);
+    free(buffer);
 
     add_scum(addr);
 }
