@@ -5,7 +5,8 @@
 ; Description:
 ;   Code which will scan for free space in memory and copy itself into it.
 ;
-;   Ensure no NULL bytes in output machine code
+;   Free space equals NULL bytes, therefore ensure that there are no NULL
+;   bytes in output machine code.
 ;
 [section .text]
 
@@ -16,7 +17,7 @@ global _start
 _start:
     nop                             ; keep gdb happy
 
-    jmp         short string
+    jmp         short data
 code:
 
     pop         esi                 ; address of string
@@ -24,12 +25,11 @@ code:
 
     ret
 
-string:
-
+data:
     call        code
 str:
     db          "Germ executing",10
 str_len:        equ $-str
 
-file_len:       equ end-_start
+germ_len:       equ end-_start
 end:
