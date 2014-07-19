@@ -14,14 +14,16 @@ _start:
 code:
 
     pop         edx                 ; address of string
-    sys_write   1, edx, 10          ; fd, buff, len
+    sys_write   1, edx, str_len     ; fd, buff, len
 
     ret
 
 string:
 
     call        code
-    db          "hi there",10,0
+str:
+    db          "Germ executing",10,0
+str_len:        equ $-str
 
 len:            equ end - _start
 end:
