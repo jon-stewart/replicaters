@@ -5,6 +5,9 @@ LIST(scum);
 
 extern void *spawn_pool;
 
+/* XXX Temporary */
+static unsigned length = 0;
+
 void
 froth(void)
 {
@@ -19,6 +22,9 @@ froth(void)
         printf("[*] spawning\n");
 
         germ->entry();
+
+        /* XXX temporary to test */
+        add_scum(germ->entry + length);
     }
 }
 
@@ -36,6 +42,8 @@ infect(void)
     fseek(file, 0L, SEEK_END);
 
     len = ftell(file);
+    /* XXX temp */
+    length = len;
 
     fseek(file, 0L, SEEK_SET);
 

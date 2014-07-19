@@ -1,4 +1,5 @@
 #include <repnmem.h>
+#include <string.h>
 
 void *spawn_pool = NULL;
 
