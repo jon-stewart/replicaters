@@ -7,18 +7,23 @@
 ;
 [section .text]
 
+%include "general.mac"
+
 global _start
 
 _start:
     nop                             ; keep gdb happy
-    call        store_eip
-store_eip:
-    pop         r15
-    sub         r15, store_eip      ; our start address
 
-    jmp         short data
-code:
+    prolog                          ; prolog macro
+
+    call        store_rip
+store_rip:
+    pop         r15
+    sub         r15, store_rip      ; our start address
+
     ; print out the debug message
+    jmp         short data
+print:
     xor         rax, rax
     mov          al, 0x1            ; sys_write
     mov         rdi, 0x1            ; stdout fd
@@ -55,11 +60,14 @@ fail:
     mov         rax, 0x1
 exit:
     xor         rax, rax
+
+    epilog                          ; epilog macro
+
     ret
 
 
 data:
-    call        code
+    call        print
 str:
     db          "Germ executing",10
 str_len:        equ $-str
