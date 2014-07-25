@@ -8,7 +8,7 @@ main(int argc, char **argv)
     infect();
 
     int i;
-    for (i = 0; i < 5; ++i) {
+    for (i = 0; i < 1; ++i) {
         froth();
     }
 

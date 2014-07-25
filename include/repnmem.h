@@ -12,7 +12,7 @@
 typedef struct germ {
     list_t         ls;
 
-    void (*entry)(void);
+    unsigned (*entry)(void);
 
     unsigned int    magic;
     int             generation;

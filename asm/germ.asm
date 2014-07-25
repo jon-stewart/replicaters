@@ -7,49 +7,54 @@
 ;
 [section .text]
 
-%include "sys_calls.mac"            ; include my syscall macros
-
 global _start
 
 _start:
+    nop                             ; keep gdb happy
     call        store_eip
 store_eip:
-    pop         esi
-    sub         esi, store_eip      ; our start address
+    pop         r15
+    sub         r15, store_eip      ; our start address
 
     jmp         short data
 code:
-
-    pop         ecx                 ; address of string
-    sys_write   1, ecx, str_len     ; fd, buff, len
+    ; print out the debug message
+    xor         rax, rax
+    mov          al, 0x1            ; sys_write
+    mov         rdi, 0x1            ; stdout fd
+    pop         rsi                 ; address of string
+    mov         rdx, str_len        ; length
+    syscall
 
     ; now begin to search for enough free space
-    xor         eax, eax            ; search for NULL
-    mov         edi, esi            ; start address
-    add         edi, germ_len       ; start address + length
-    xor         ecx, ecx
-    add         ecx, germ_len       ; counter
+    xor         rax, rax            ; search for NULL
+    mov         rdi, r15            ; start address
+    add         rdi, germ_len       ; start address + length
+    xor         rcx, rcx
+    add         rcx, germ_len       ; counter
 
 loop:
-    add         edi, 0x1
-    cmp         [edi], al
+    add         rdi, 0x1
+    cmp         [rdi], al
     jne         fail
 
     dec         cl
-    cmp         ecx, 0x0
+    cmp         rcx, 0x0
     jne         loop
 
     ; there is space to copy
-    mov         edi, esi
-    add         edi, germ_len
-    mov         ecx, germ_len
+    mov         rdi, r15
+    add         rdi, germ_len
+    mov         rdi, germ_len
     rep         movsb
 
     jmp         exit
 fail:
     ; there is not enough space to copy
-    mov         ebx, 0xDEADBEEF
+    mov         rbx, 0xDEADBEEF
+    mov         rax, 0x1
 exit:
+    xor         rax, rax
     ret
 
 

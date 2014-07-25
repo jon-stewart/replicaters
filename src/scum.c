@@ -13,6 +13,7 @@ froth(void)
 {
     list_t     *ptr  = NULL;
     germ_t     *germ = NULL;
+    unsigned    ret;
 
 
     for_each_list_ele(&scum, ptr) {
@@ -21,9 +22,13 @@ froth(void)
 
         printf("[*] spawning\n");
 
-        germ->entry();
+        ret = germ->entry(); 
 
+        if (ret == 0) {
+            printf("PASS\n");
+        }
     }
+
     /* XXX temporary to test */
     add_scum(germ->entry + length);
 }
