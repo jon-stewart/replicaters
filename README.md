@@ -24,7 +24,7 @@ When working on the idea of each germ having its own stack frame in the pool I
 realised that if germs fault, the whole program goes down.
 
 If I am to have crossover and mutation in replication then this is likely to
-occur... shit.
+occur...
 
 I may have ran down the wrong path on this.  Perhaps it would be simpler to
 have had these germs running rogue in the memory space of a virtual machine..
