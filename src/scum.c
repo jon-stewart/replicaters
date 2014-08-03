@@ -1,8 +1,8 @@
 #include <repnmem.h>
 #include <string.h>
 #include <unistd.h>
-#include <sched.h>
-//#include <sys/utsname.h>
+#define _GNU_SOURCE
+#include <linux/sched.h>
 
 LIST(scum);
 
@@ -43,6 +43,8 @@ froth(void)
         /* XXX provide each germ with its own stack */
         char *stack = malloc(1024);
         char *stackTop = stack + 1024;
+
+        /* XXX CLONE_VM should be used here - why does it break? */
         clone(child_, stackTop, 0, (void *) germ);
     }
 
