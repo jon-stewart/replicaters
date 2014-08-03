@@ -1,6 +1,8 @@
 #include <repnmem.h>
 #include <string.h>
 #include <unistd.h>
+#include <sched.h>
+//#include <sys/utsname.h>
 
 LIST(scum);
 
@@ -8,6 +10,20 @@ extern void *spawn_pool;
 
 /* XXX Temporary */
 static unsigned length = 0;
+
+static int
+child_(void *arg)
+{
+    int         ret;
+    germ_t     *germ = (germ_t *) arg;
+
+    ret = germ->entry();
+    if (ret == 0) {
+        printf("[-] PASS\n");
+    }
+
+    return (ret);
+}
 
 void
 froth(void)
@@ -24,13 +40,10 @@ froth(void)
 
         printf("[*] spawning\n");
 
-        child_pid = fork();
-        if (child_pid == 0) {
-            ret = germ->entry();
-            if (ret == 0) {
-                printf("[-] PASS\n");
-            }
-        }
+        /* XXX provide each germ with its own stack */
+        char *stack = malloc(1024);
+        char *stackTop = stack + 1024;
+        clone(child_, stackTop, 0, (void *) germ);
     }
 
     printf("[*] Froth finish\n");
