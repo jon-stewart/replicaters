@@ -1,7 +1,7 @@
-repnmem
+replicaters
 =======
 
-Replicators in memory
+Replicaters in memory
 
 
 

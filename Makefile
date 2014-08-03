@@ -1,4 +1,4 @@
-target := repnmem
+target := replicaters
 
 c_opts = -Wall
 c_opts += -I include/
