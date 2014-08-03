@@ -1,5 +1,9 @@
-#ifndef _DLIST_H_
-#define _DLIST_H_
+#ifndef _LIST_H_
+#define _LIST_H_
+
+#define LIST_INIT(name) { &(name), &(name) }
+#define LIST(name) \
+    list_t name = LIST_INIT(name)
 
 typedef struct list list_t;
 struct list {

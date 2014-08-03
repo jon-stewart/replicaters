@@ -9,7 +9,7 @@ list_init(list_t *list)
 }
 
 void
-list_add_back(list_t *head, list_t *list)
+list_add(list_t *head, list_t *list)
 {
     list_t     *prev;
 
