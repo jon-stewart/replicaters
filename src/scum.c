@@ -30,8 +30,6 @@ froth(void)
 {
     list_t     *ptr  = NULL;
     germ_t     *germ = NULL;
-    unsigned    ret;
-    pid_t       child_pid;
 
 
     for_each_list_ele(&scum, ptr) {

@@ -5,31 +5,27 @@
 ; Description:
 ;   Code which will scan for free space in memory and copy itself into it.
 ;
-;   This must be encoded in x86 assembly as nasmx64 will not resolve labels
+;   This must be encoded in x86 assembly as nasm x64 will not resolve labels
 ;   if used as memory addresses.
 ;
 [section .text]
 
-%include "general.mac"
-
 global _start
 
 _start:
-    nop                             ; keep gdb happy
-
+    nop
     call        delta
 delta:
     pop         ebp
     sub         ebp, delta          ; our start address
 
     ; print out the debug message
-    jmp         short data
 print:
     xor         eax, eax
-    mov          al, 0x4            ; sys_write
-    mov          bl, 0x1            ; stdout fd
-    pop         ecx                 ; address of string
-    mov          dl, str_len        ; length
+    mov         al, 0x4             ; sys_write
+    mov         bl, 0x1             ; stdout fd
+    lea         ecx, [ebp + str]    ; address of string
+    mov         dl, str_len         ; length
     int         0x80
 
     ; now begin to search for enough free space
@@ -64,11 +60,8 @@ exit:
 
     ret
 
-
-data:
-    call        print
-str:
-    db          "Germ executing",10
+; germ header
+str:            db  "germ executing",10
 str_len:        equ $-str
 
 germ_len:       equ end-_start
