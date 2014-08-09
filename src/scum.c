@@ -19,7 +19,7 @@ child_(void *arg)
 
     ret = germ->entry();
     if (ret == 0) {
-        printf("[-] PASS\n");
+        printf("[*] PASS\n");
     }
 
     return (ret);

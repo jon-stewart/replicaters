@@ -19,14 +19,10 @@ delta:
     pop         ebp
     sub         ebp, delta          ; our start address
 
-    ; print out the debug message
-print:
-    xor         eax, eax
-    mov         al, 0x4             ; sys_write
-    mov         bl, 0x1             ; stdout fd
-    lea         ecx, [ebp + str]    ; address of string
-    mov         dl, str_len         ; length
-    int         0x80
+    ; print out the begin execution message
+    lea         ecx, [ebp + exe_str]
+    mov         edx, exe_str_len
+    call        print
 
     ; now begin to search for enough free space
     xor         eax, eax            ; search for NULL
@@ -53,16 +49,51 @@ loop:
     jmp         exit
 fail:
     ; there is not enough space to copy
+
+    ; print failure message
+    lea         ecx, [ebp + fail_str]
+    mov         edx, fail_str_len
+    call        print
+
     mov         ebx, 0xDEADBEEF
     mov         eax, 0x1
 exit:
-    xor         eax, eax
 
+    ; print completion message
+    lea         ecx, [ebp + comp_str]
+    mov         edx, comp_str_len
+    call        print
+
+    xor         eax, eax
     ret
 
+;------------------------------------------------------------------------------
+; print function
+;   IN:
+;       -ecx : address of string
+;       -edx : string length
+;
+print:
+    xor         eax, eax
+    xor         ebx, ebx
+    mov         al, 0x4             ; sys_write
+    mov         bl, 0x1             ; stdout fd
+    int         0x80
+    ret
+
+
+;------------------------------------------------------------------------------
 ; germ header
-str:            db  "germ executing",10
-str_len:        equ $-str
+;
+
+exe_str:        db "[x] germ executing",10
+exe_str_len:    equ $-exe_str
+
+comp_str:       db "[x] complete",10
+comp_str_len:   equ $-comp_str
+
+fail_str:       db "[x] failure",10
+fail_str_len:   equ $-fail_str
 
 germ_len:       equ end-_start
 end:
