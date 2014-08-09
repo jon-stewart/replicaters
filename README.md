@@ -43,11 +43,10 @@ Progress:
 
     With x64 this produces obj file with:
 
-        1:   e8 00 00 00 00          call   6 <label>
-
-    0000000000000006 <label>:
-        6:   41 5f                   pop    r15
-        8:   49 81 ef 00 00 00 00    sub    r15,0x0
+            1:   e8 00 00 00 00          call   6 <label>
+        0000000000000006 <label>:
+            6:   41 5f                   pop    r15
+            8:   49 81 ef 00 00 00 00    sub    r15,0x0
 
 
     X86 would have had 'sub <reg>,6'...  I haven't been able to google an
