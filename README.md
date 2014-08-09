@@ -30,7 +30,7 @@ stack.
 
 -------------
 
-Progress:
+x64 delta offset trick:
 =======
 
 * Seems that there is a change to how nasm x64 handles labels:
