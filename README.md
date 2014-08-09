@@ -27,3 +27,31 @@ Solution is of course to spawn a child process to execute our germ code.  If it
 faults - clear the memory space and remove from the list.  I will use sys_clone
 instead of fork as this will allow me to provide each organism with its own
 stack.
+
+-------------
+
+Progress:
+=======
+
+* Seems that there is a change to how nasm x64 handles labels:
+
+        call label
+    label:
+        pop  r15
+        sub  r15, label
+
+
+    With x64 this produces obj file with:
+
+        1:   e8 00 00 00 00          call   6 <label>
+
+    0000000000000006 <label>:
+        6:   41 5f                   pop    r15
+        8:   49 81 ef 00 00 00 00    sub    r15,0x0
+
+
+    X86 would have had 'sub <reg>,6'...  I haven't been able to google an
+    explanation for this.
+    
+    This means the delta offset trick doesn't work with x64 assembly..  Wonder
+    if I should just use x86 again.

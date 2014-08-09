@@ -14,8 +14,6 @@ global _start
 _start:
     nop                             ; keep gdb happy
 
-    prolog                          ; prolog macro
-
     call        store_rip
 store_rip:
     pop         r15
@@ -60,8 +58,6 @@ fail:
     mov         rax, 0x1
 exit:
     xor         rax, rax
-
-    epilog                          ; epilog macro
 
     ret
 
