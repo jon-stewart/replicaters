@@ -60,6 +60,11 @@ Using clone with the CLONE_VM seems to scramble the memory space that I have
 written the germ into. This should mean the child is more like a thread and
 shares the memory space...
 
+Seems that a qword is written twice (0xf7dd6cd8 0x00007fff) to the start of
+the block of memory.  Address to some structure..
+
+USE PTHREAD YOU FOOL!
+
 ####Callback trouble:
 
 We can pass a callback as an argument to the germ, the address is contained in

@@ -49,7 +49,8 @@ froth(void)
         char *stackTop = stack + 1024;
 
         /* XXX CLONE_VM should be used here - why does it break? */
-        clone(child_, stackTop, (CLONE_VM | CLONE_FS), (void *) germ);
+        /* 0xf7dd6cd8      0x00007fff  written twice to start address.. */
+        clone(child_, stackTop, (CLONE_VM | CLONE_FS | CLONE_SETTLS), (void *) germ);
     }
 
     printf("[*] Froth finish\n");
