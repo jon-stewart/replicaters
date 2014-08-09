@@ -35,10 +35,10 @@ Progress:
 
 * Seems that there is a change to how nasm x64 handles labels:
 
-        call label
-    label:
-        pop  r15
-        sub  r15, label
+            call label
+        label:
+            pop  r15
+            sub  r15, label
 
 
     With x64 this produces obj file with:
