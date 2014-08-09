@@ -1,4 +1,4 @@
-#include <repnmem.h>
+#include <replicaters.h>
 #include <string.h>
 #include <unistd.h>
 #define _GNU_SOURCE
@@ -11,13 +11,19 @@ extern void *spawn_pool;
 /* XXX Temporary */
 static unsigned length = 0;
 
+void
+callback(void *addr, unsigned length)
+{
+    printf("[*] callback : %p, %x\n", addr, length);
+}
+
 static int
 child_(void *arg)
 {
     int         ret;
     germ_t     *germ = (germ_t *) arg;
 
-    ret = germ->entry();
+    ret = germ->entry((void *) callback);
     if (ret == 0) {
         printf("[*] PASS\n");
     }
@@ -43,7 +49,7 @@ froth(void)
         char *stackTop = stack + 1024;
 
         /* XXX CLONE_VM should be used here - why does it break? */
-        clone(child_, stackTop, 0, (void *) germ);
+        clone(child_, stackTop, (CLONE_VM | CLONE_FS), (void *) germ);
     }
 
     printf("[*] Froth finish\n");

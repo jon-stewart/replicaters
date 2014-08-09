@@ -15,8 +15,8 @@ To have code organisms replicating and competing in a memory space a chunk of
 standalone code is required.  The organisms are not true organisms if they are
 simply making use of the host functions.
 
-I will use assembly, compile with nasm, strip the .text section with my disas.py program
-and then read and write this 'shellcode' to the memory space.
+I will use assembly, compile with nasm, strip the .text section with my
+disas.py program and then read and write this 'shellcode' to the memory space.
 
 --------------
 
@@ -40,7 +40,7 @@ stack.
             sub  r15, label
 
 
-    With x64 this produces obj file with:
+With x64 this produces obj file with:
 
             1:   e8 00 00 00 00          call   6 <label>
         0000000000000006 <label>:
@@ -48,8 +48,22 @@ stack.
             8:   49 81 ef 00 00 00 00    sub    r15,0x0
 
 
-    X86 would have had 'sub <reg>,6'...  I haven't been able to google an
-    explanation for this.
+X86 would have had 'sub <reg>,6'...  I haven't been able to google an
+explanation for this.
     
-    This means the delta offset trick doesn't work with x64 assembly..  Wonder
-    if I should just use x86 again.
+This means the delta offset trick doesn't work with x64 assembly..  To get
+around this I am returning to x86 asm.
+
+####CLONE_VM:
+
+Using clone with the CLONE_VM seems to scramble the memory space that I have
+written the germ into. This should mean the child is more like a thread and
+shares the memory space...
+
+####Callback trouble:
+
+We can pass a callback as an argument to the germ, the address is contained in
+rdi (edi).
+
+The issue arises on return from the callback function, we land on the correct
+address but the memory space is scrambled...

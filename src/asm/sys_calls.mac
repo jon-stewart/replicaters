@@ -71,10 +71,10 @@
     xor eax,eax
     xor ebx,ebx
     xor edx,edx
-    mov  al, 0x4            ; sys_write
-    mov  bl, %1             ; fd
+    mov al, 0x4             ; sys_write
+    mov bl, %1              ; fd
     mov ecx, %2             ; buffer
-    mov  dl, %3             ; length
+    mov dl, %3              ; length
     int 0x80
 %endmacro
 
