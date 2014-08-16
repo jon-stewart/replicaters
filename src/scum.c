@@ -1,15 +1,10 @@
 #include <replicaters.h>
 #include <string.h>
-#include <unistd.h>
-#define _GNU_SOURCE
-#include <linux/sched.h>
+#include <pthread.h>
 
 LIST(scum);
 
 extern void *spawn_pool;
-
-/* XXX Temporary */
-static unsigned length = 0;
 
 void
 callback(void *addr, unsigned length)
@@ -17,7 +12,7 @@ callback(void *addr, unsigned length)
     printf("[*] callback : %p, %x\n", addr, length);
 }
 
-static int
+void *
 child_(void *arg)
 {
     int         ret;
@@ -28,7 +23,7 @@ child_(void *arg)
         printf("[*] PASS\n");
     }
 
-    return (ret);
+    return (NULL);
 }
 
 void
@@ -36,6 +31,8 @@ froth(void)
 {
     list_t     *ptr  = NULL;
     germ_t     *germ = NULL;
+    pthread_t   thd;
+    int         ret;
 
 
     for_each_list_ele(&scum, ptr) {
@@ -44,19 +41,16 @@ froth(void)
 
         printf("[*] spawning\n");
 
-        /* XXX provide each germ with its own stack */
-        char *stack = malloc(1024);
-        char *stackTop = stack + 1024;
-
-        /* XXX CLONE_VM should be used here - why does it break? */
-        /* 0xf7dd6cd8      0x00007fff  written twice to start address.. */
-        clone(child_, stackTop, (CLONE_VM | CLONE_FS | CLONE_SETTLS), (void *) germ);
+        ret = pthread_create(&thd, NULL, child_, (void *) germ);
+        if (ret) {
+            fprintf(stderr, "errors : %d\n", ret);
+        }
     }
+
+    pthread_join(thd, NULL);
 
     printf("[*] Froth finish\n");
 
-    /* XXX temporary to test */
-    add_scum(germ->entry + length);
 }
 
 void
@@ -73,8 +67,6 @@ infect(void)
     fseek(file, 0L, SEEK_END);
 
     len = ftell(file);
-    /* XXX temp */
-    length = len;
 
     fseek(file, 0L, SEEK_SET);
 

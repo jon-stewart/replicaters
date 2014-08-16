@@ -3,6 +3,7 @@ target := replicaters
 c_opts = -Wall
 c_opts += -I include/
 c_opts += -ggdb
+c_opts += -lpthread
 c_opts += -z execstack
 
 src := $(wildcard src/*.c)
