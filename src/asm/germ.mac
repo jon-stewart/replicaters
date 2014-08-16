@@ -10,7 +10,7 @@
 ;       print
 ;
 %macro _print 2
-    lea         ecx, [ebp + %1]     ; string
+    lea         ecx, [esi + %1]     ; string
     xor         edx, edx
     mov         dl,  %2             ; string length
     call        print

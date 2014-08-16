@@ -22,8 +22,8 @@ _start:
     nop
     call        delta
 delta:
-    pop         ebp
-    sub         ebp, delta          ; our start address
+    pop         esi
+    sub         esi, delta          ; our start address
 
     ; print out the begin execution message
     _print      exe_str, exe_str_len
