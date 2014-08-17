@@ -51,8 +51,10 @@ With x64 this produces obj file with:
 X86 would have had 'sub <reg>,6'...  I haven't been able to google an
 explanation for this.
     
-This means the delta offset trick doesn't work with x64 assembly..  To get
-around this I am returning to x86 asm.
+This means the delta offset trick doesn't work with x64 assembly.  Nasm leaves
+the label addressing to the linker.
+
+Solution - run it through LD with -Ttext 0 and then strip the text section!
 
 ####CLONE_VM:
 

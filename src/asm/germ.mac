@@ -10,10 +10,10 @@
 ;       print
 ;
 %macro _print 2
-    lea         ecx, [esi + %1]     ; string
-    xor         edx, edx
+    lea         rsi, [r15 + %1]     ; string
+    xor         rdx, rdx
     mov         dl,  %2             ; string length
     call        print
-    cmp         eax, edx            ; compare #bytes written to string length
+    cmp         rax, rdx            ; compare #bytes written to string length
     jne         failure             ; goto fail if any issues
 %endmacro

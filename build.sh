@@ -4,6 +4,8 @@ make clean
 
 make
 
-nasm -f elf -o /tmp/germ.o -I src/asm/ src/asm/germ.asm
+nasm -f elf64 -o /tmp/germ.o -I src/asm/ src/asm/germ.asm
 
-python ../disas/disas.py -s /tmp/germ.o
+ld -Ttext 0 -o /tmp/germ /tmp/germ.o
+
+python ../disas/disas.py -s /tmp/germ

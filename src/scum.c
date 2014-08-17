@@ -18,6 +18,7 @@ child_(void *arg)
     int         ret;
     germ_t     *germ = (germ_t *) arg;
 
+    printf("[*] START\n");
     ret = germ->entry((void *) callback);
     if (ret == 0) {
         printf("[*] PASS\n");
