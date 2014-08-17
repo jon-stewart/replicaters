@@ -2,17 +2,19 @@
 ; _print:
 ;       wrapper for print function
 ; in:       
-;       1-address of string
-;       2-string length
+;       1-start address
+;       2-string offset
+;       3-string length
 ; returns:
 ;       n/a
 ; calls:
 ;       print
 ;
-%macro _print 2
-    lea         rsi, [r15 + %1]     ; string
+%macro _print 3
+    mov         rdx, [rbp-%1]       ; start address
+    lea         rsi, [rdx+%2]       ; string address
     xor         rdx, rdx
-    mov         dl,  %2             ; string length
+    mov         dl,  %3             ; string length
     call        print
     cmp         rax, rdx            ; compare #bytes written to string length
     jne         failure             ; goto fail if any issues

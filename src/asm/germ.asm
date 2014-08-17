@@ -23,14 +23,22 @@ global _start
 
 _start:
     nop
+    
+    ; prolog - stack frame creation
+    push        rbp
+    mov         rbp, rsp
+    sub         rsp, 0x8
+    ; stack frame:
+    ;   - 0x8 start address
 
     call        delta
 delta:
     pop         r15
-    sub         r15, delta      ; our start address
+    sub         r15, delta          ; our start address
+    mov         [rbp-0x8], r15      ; store start address
 
     ; print out the begin execution message
-    _print      exe_str, exe_str_len
+    _print      0x8, exe_str, exe_str_len
 
 ;    call        search
 
@@ -38,8 +46,11 @@ delta:
 
 exit:
     ; print completion message
-    _print      comp_str, comp_str_len
+    _print      0x8, comp_str, comp_str_len
 
+    ; epilog - stack frame cleanup
+    add         rsp, 0x8
+    pop         rbp
     xor         rax, rax
     ret
 
@@ -54,8 +65,8 @@ exit:
 ;
 print:
     xor         rax, rax
-    mov         rax,  0x1            ; sys_write
-    mov         rdi, 0x1             ; stdout fd
+    mov         al,  0x1            ; sys_write
+    mov         rdi, 0x1            ; stdout fd
     syscall
     ret
 
@@ -110,7 +121,7 @@ copy:
 ;
 failure:
     ; print out failure message
-    _print      fail_str, fail_str_len
+    _print      0x8, fail_str, fail_str_len
 
     mov         rbx, 0xDEADBEEF
     mov         rax, 0x1
