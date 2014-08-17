@@ -15,7 +15,6 @@
 [section .text]
 
 [BITS 64]
-default rel
 
 %include "germ.mac"
 
