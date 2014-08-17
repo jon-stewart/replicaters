@@ -44,12 +44,12 @@ delta:
 
 ;    call        copy
 
-exit:
     ; print completion message
     _print      0x8, comp_str, comp_str_len
 
+exit:
     ; epilog - stack frame cleanup
-    add         rsp, 0x8
+    mov         rsp, rbp
     pop         rbp
     xor         rax, rax
     ret
@@ -126,8 +126,8 @@ failure:
     mov         rbx, 0xDEADBEEF
     mov         rax, 0x1
 
-    ; exit
-    ret
+    pop         r15                 ; get rid of previous return address
+    jmp         exit
 
 
 ;------------------------------------------------------------------------------
