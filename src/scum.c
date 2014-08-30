@@ -4,7 +4,7 @@
 
 LIST(scum);
 
-extern void *spawn_pool;
+extern void *vat;
 
 void
 callback(void *addr, unsigned length)
@@ -19,19 +19,24 @@ child_(void *arg)
     germ_t     *germ = (germ_t *) arg;
     pthread_t   tid = pthread_self();
 
+    if (germ->tid) {
+        return (NULL);
+    }
+
     germ->tid = tid;
 
     printf("[*] START\n");
     ret = germ->entry((void *) callback);
     if (ret == 0) {
         printf("[*] PASS\n");
+        germ->tid = 0;
     }
 
     return (NULL);
 }
 
 void
-froth(void)
+scum_froth(void)
 {
     list_t     *ptr  = NULL;
     germ_t     *germ = NULL;
@@ -58,7 +63,7 @@ froth(void)
 }
 
 void
-infect(void)
+scum_infect(void)
 {
     FILE       *file    = NULL;
     char       *buffer  = NULL;
@@ -80,17 +85,17 @@ infect(void)
 
     fclose(file);
 
-    addr = spawn_pool;
+    addr = vat;
 
     memcpy(addr, buffer, len);
 
     free(buffer);
 
-    add_scum(addr);
+    scum_add(addr);
 }
 
 void
-add_scum(void *addr)
+scum_add(void *addr)
 {
     germ_t     *germ = NULL;
 
@@ -101,13 +106,12 @@ add_scum(void *addr)
     germ->entry      = addr;
     germ->magic      = 0;
     germ->generation = 1;
-    germ->dead       = 0;
 
     list_add(&scum, &germ->ls);
 }
 
 void
-release_scum(void)
+scum_release(void)
 {
     germ_t     *germ = NULL;
 

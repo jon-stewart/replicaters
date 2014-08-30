@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <list.h>
 
-#define SPAWN_POOL_SIZE     (1 << 9)
+#define VAT_SIZE            (1 << 9)
 #define GERM_CODE           ("/tmp/output.sc")
 
 typedef struct germ {
@@ -17,18 +17,18 @@ typedef struct germ {
 
     unsigned int    magic;
     int             generation;
-    bool            dead;
     pthread_t       tid;
 
 } germ_t;
 
-void init_spawn_pool(void);
-void destroy_spawn_pool(void);
+void vat_init(void);
+void vat_destroy(void);
 
-void froth(void);
-void add_scum(void *);
-void release_scum(void);
+void scum_froth(void);
+void scum_infect(void);
+void scum_add(void *);
+void scum_release(void);
 
-void infect(void);
+void reaper_init(void);
 
 #endif /* _REPNMEM_H_ */
