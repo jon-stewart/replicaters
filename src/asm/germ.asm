@@ -82,6 +82,7 @@ search:
     add         rdi, germ_len       ; start address + length
     xor         rcx, rcx
     add         rcx, germ_len       ; counter
+    repnz       scasb
 
 .loop:
     add         rdi, 0x1
