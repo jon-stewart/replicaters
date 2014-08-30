@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <assert.h>
 #include <list.h>
 
@@ -16,6 +17,8 @@ typedef struct germ {
 
     unsigned int    magic;
     int             generation;
+    bool            dead;
+    pthread_t       tid;
 
 } germ_t;
 

@@ -17,6 +17,9 @@ child_(void *arg)
 {
     int         ret;
     germ_t     *germ = (germ_t *) arg;
+    pthread_t   tid = pthread_self();
+
+    germ->tid = tid;
 
     printf("[*] START\n");
     ret = germ->entry((void *) callback);
@@ -97,7 +100,8 @@ add_scum(void *addr)
 
     germ->entry      = addr;
     germ->magic      = 0;
-    germ->generation = 0;
+    germ->generation = 1;
+    germ->dead       = 0;
 
     list_add(&scum, &germ->ls);
 }
