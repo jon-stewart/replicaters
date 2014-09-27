@@ -2,16 +2,28 @@
 #include <string.h>
 #include <pthread.h>
 
+/*
+ * XXX This could be neater
+ */
 typedef struct list_head {
     list_t list;
     pthread_mutex_t mtx;
 } list_head_t;
+
+/*
+ * XXX Do this better
+ */
+typedef struct damn {
+    list_t      list;
+    pthread_t   tid;
+} damn_t;
 
 typedef struct vat {
     void *pool;
 
     list_head_t scum;
     list_head_t germinate;
+    list_head_t damned;
 
 } vat_t;
 
@@ -25,9 +37,13 @@ vat_init(void)
 
     list_init(&vat.scum.list);
     pthread_mutex_init(&vat.scum.mtx, NULL);
+    /* XXX wrap pthreads in macro */
 
     list_init(&vat.germinate.list);
     pthread_mutex_init(&vat.germinate.mtx, NULL);
+
+    list_init(&vat.damned.list);
+    pthread_mutex_init(&vat.damned.mtx, NULL);
 }
 
 void
@@ -149,4 +165,36 @@ foam(void)
     }
 
     pthread_mutex_unlock(&vat.scum.mtx);
+}
+
+void
+damn(pthread_t tid)
+{
+    damn_t  *damn = malloc(sizeof (*damn));
+
+    damn.tid = tid;
+
+    pthread_mutex_lock(&vat.damned.mtx);    
+
+    list_add(&vat.damned.list, &damn.ls);
+
+    pthread_mutex_unlock(&vat.damned.mtx);    
+}
+
+void
+reap(void)
+{
+    list_t *ptr  = NULL;
+    damn_t *damn = NULL;
+
+
+    pthread_mutex_lock(&vat.damned.mtx);
+
+    for_each_list_ele(&vat.damned.list, ptr) {
+        damn = (damn_t *) ptr;
+
+        
+    }
+
+    pthread_mutex_unlock(&vat.damned.mtx);
 }
