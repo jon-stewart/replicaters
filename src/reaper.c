@@ -12,7 +12,7 @@ void
 reaper_init(void)
 {
     reaper_reg_sig_handler(SIGSEGV);
-    reaper_reg_sig_handler(SIGSEGV);
+    reaper_reg_sig_handler(SIGBUS);
 }
 
 static void
@@ -31,13 +31,19 @@ reaper_signal(int signo)
 
     tid = pthread_self();
 
-    printf("[!] Caught signal %d : %lu\n", signo, tid);
+    printf("[!] Caught signal %d : 0x%lx\n", signo, tid);
 
+    /*
+     * TODO - Add and signal
+     */
 //    list_add(&damned, x);
 
     pthread_exit(0);
 }
 
+/*
+ * TODO - cv_wait for germs to kill
+ */
 void
 reaper_kill(void)
 {

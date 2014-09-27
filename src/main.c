@@ -7,11 +7,9 @@ main(int argc, char **argv)
 
     vat_init();
 
-    scum_infect();
+    infect();
 
-    scum_froth();
-
-    scum_release();
+    froth();
 
     vat_destroy();
 

@@ -21,14 +21,19 @@ typedef struct germ {
 
 } germ_t;
 
+/* vat.c */
 void vat_init(void);
 void vat_destroy(void);
+void *vat_base_address(void);
+void vat_scum_add(void *);
+void vat_scum_release(void);
 
-void scum_froth(void);
-void scum_infect(void);
-void scum_add(void *);
-void scum_release(void);
+/* germ.c */
+void froth(void);
+void infect(void);
+void *spawn(void *);
 
+/* reaper.c */
 void reaper_init(void);
 
 #endif /* _REPNMEM_H_ */
