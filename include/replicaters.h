@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <list.h>
+#include <pthread.h>
 
 #define VAT_SIZE            (1 << 9)
 #define GERM_CODE           ("/tmp/output.sc")
@@ -17,8 +18,8 @@ typedef struct germ {
 
     unsigned int    magic;
     int             generation;
+    bool            dead;
     pthread_t       tid;
-
 } germ_t;
 
 /* vat.c */
@@ -27,6 +28,8 @@ void vat_destroy(void);
 void *vat_base_address(void);
 void vat_scum_add(void *);
 void vat_scum_release(void);
+void stir(void);
+void reap(pthread_t);
 
 /* germ.c */
 void foam(void);

@@ -64,3 +64,16 @@ list_rm_back(list_t *head)
 
     return (list);
 }
+
+void
+list_rm(list_t *ele)
+{
+    list_t *prev = ele->prev;
+    list_t *next = ele->next;
+
+    prev->next = next;
+    next->prev = prev;
+
+    ele->prev = NULL;
+    ele->next = NULL;
+}

@@ -1,30 +1,14 @@
 #include <replicaters.h>
 #include <string.h>
-#include <pthread.h>
-
-/*
- * XXX This could be neater
- */
-typedef struct list_head {
-    list_t list;
-    pthread_mutex_t mtx;
-} list_head_t;
-
-/*
- * XXX Do this better
- */
-typedef struct damn {
-    list_t      list;
-    pthread_t   tid;
-} damn_t;
 
 typedef struct vat {
     void *pool;
 
-    list_head_t scum;
-    list_head_t germinate;
-    list_head_t damned;
+    list_t scum;
+    pthread_rwlock_t scum_rw;
 
+    list_t fresh;
+    pthread_mutex_t fresh_mtx;
 } vat_t;
 
 static vat_t vat;
@@ -35,15 +19,11 @@ vat_init(void)
     vat.pool = malloc(VAT_SIZE);
     assert(vat.pool != NULL);
 
-    list_init(&vat.scum.list);
-    pthread_mutex_init(&vat.scum.mtx, NULL);
-    /* XXX wrap pthreads in macro */
+    list_init(&vat.scum);
+    pthread_rwlock_init(&vat.scum_rw, NULL);
 
-    list_init(&vat.germinate.list);
-    pthread_mutex_init(&vat.germinate.mtx, NULL);
-
-    list_init(&vat.damned.list);
-    pthread_mutex_init(&vat.damned.mtx, NULL);
+    list_init(&vat.fresh);
+    pthread_mutex_init(&vat.fresh_mtx, NULL);
 }
 
 void
@@ -75,12 +55,14 @@ vat_scum_add(void *addr)
     germ->entry      = addr;
     germ->magic      = 0;
     germ->generation = 1;
+    germ->dead       = false;
+    germ->tid        = 0;
 
-    pthread_mutex_lock(&vat.germinate.mtx);
+    pthread_mutex_lock(&vat.fresh_mtx);
 
-    list_add(&vat.germinate.list, &germ->ls);
+    list_add(&vat.fresh, &germ->ls);
 
-    pthread_mutex_unlock(&vat.germinate.mtx);
+    pthread_mutex_unlock(&vat.fresh_mtx);
 }
 
 void
@@ -88,16 +70,16 @@ vat_scum_release(void)
 {
     germ_t     *germ = NULL;
 
-    pthread_mutex_lock(&vat.scum.mtx);
+    pthread_rwlock_wrlock(&vat.scum_rw);
 
-    while (!list_empty(&vat.scum.list)) {
-        germ = (germ_t *) list_rm_back(&vat.scum.list);
+    while (!list_empty(&vat.scum)) {
+        germ = (germ_t *) list_rm_back(&vat.scum);
         assert(germ != NULL);
 
         free(germ);
     }
 
-    pthread_mutex_unlock(&vat.scum.mtx);
+    pthread_rwlock_unlock(&vat.scum_rw);
 }
 
 /*
@@ -111,13 +93,13 @@ froth(void)
     pthread_t   thd;
     int         ret;
 
-    pthread_mutex_lock(&vat.scum.mtx);
 
-    for_each_list_ele(&vat.scum.list, ptr) {
+    pthread_rwlock_rdlock(&vat.scum_rw);
+
+    for_each_list_ele(&vat.scum, ptr) {
         germ = (germ_t *) ptr;
-        assert(germ != NULL);
 
-        printf("[*] spawning\n");
+        printf("[*] spawning\n", germ);
 
         ret = pthread_create(&thd, NULL, spawn, (void *) germ);
         if (ret) {
@@ -127,74 +109,62 @@ froth(void)
         }
     }
 
-    pthread_mutex_unlock(&vat.scum.mtx);
+    pthread_rwlock_unlock(&vat.scum_rw);
 
     printf("[*] Froth finish\n");
 }
 
 /*
- * Add germinated germs to the scum
+ * Add fresh germs to the scum
  */
 void
-foam(void)
+stir(void)
 {
-    list_t  transition;
-    germ_t *germ;
+    germ_t *germ = NULL;
+    list_t *ptr  = NULL;
+    list_t *nxt  = NULL;
 
-    list_init(&transition);
 
-    pthread_mutex_lock(&vat.germinate.mtx);
+    pthread_rwlock_wrlock(&vat.scum_rw);
 
-    while (!list_empty(&vat.germinate.list)) {
-        germ = (germ_t *) list_rm_front(&vat.germinate.list);
-        assert(germ != NULL);
+    /* Reap the dead */
+    for_each_list_ele_safe(&vat.scum, nxt, ptr) {
+        germ = (germ_t *) ptr;
 
-        list_add(&transition, &germ->ls);
+        if (germ->dead == true) {
+            list_rm(&germ->ls);
+            free(germ);
+        }
     }
 
-    pthread_mutex_unlock(&vat.germinate.mtx);
+    pthread_mutex_lock(&vat.fresh_mtx);
 
+    while (!list_empty(&vat.fresh)) {
+        germ = (germ_t *) list_rm_front(&vat.fresh);
 
-    pthread_mutex_lock(&vat.scum.mtx);
-
-    while (!list_empty(&transition)) {
-        germ = (germ_t *) list_rm_front(&transition);
-        assert(germ != NULL);
-
-        list_add(&vat.scum.list, &germ->ls);
+        list_add(&vat.scum, &germ->ls); 
     }
 
-    pthread_mutex_unlock(&vat.scum.mtx);
+    pthread_mutex_unlock(&vat.fresh_mtx);
+
+    pthread_rwlock_unlock(&vat.scum_rw);
 }
 
 void
-damn(pthread_t tid)
-{
-    damn_t  *damn = malloc(sizeof (*damn));
-
-    damn.tid = tid;
-
-    pthread_mutex_lock(&vat.damned.mtx);    
-
-    list_add(&vat.damned.list, &damn.ls);
-
-    pthread_mutex_unlock(&vat.damned.mtx);    
-}
-
-void
-reap(void)
+reap(pthread_t tid)
 {
     list_t *ptr  = NULL;
-    damn_t *damn = NULL;
+    germ_t *germ = NULL;
 
+    pthread_rwlock_rdlock(&vat.scum_rw);
 
-    pthread_mutex_lock(&vat.damned.mtx);
+    for_each_list_ele(&vat.scum, ptr) {
+        germ = (germ_t *) ptr;
 
-    for_each_list_ele(&vat.damned.list, ptr) {
-        damn = (damn_t *) ptr;
-
-        
+        if (germ->tid == tid) {
+            germ->dead = true;
+        }
     }
 
-    pthread_mutex_unlock(&vat.damned.mtx);
+    pthread_rwlock_unlock(&vat.scum_rw);
 }

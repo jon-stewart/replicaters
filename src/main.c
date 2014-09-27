@@ -9,7 +9,10 @@ main(int argc, char **argv)
 
     infect();
 
-    foam();
+    stir();
+    froth();
+
+    stir();
     froth();
 
     vat_destroy();

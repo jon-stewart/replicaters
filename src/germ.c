@@ -1,6 +1,5 @@
 #include <replicaters.h>
 #include <string.h>
-#include <pthread.h>
 
 static void
 callback(void *addr, unsigned length)
@@ -11,21 +10,20 @@ callback(void *addr, unsigned length)
 void *
 spawn(void *arg)
 {
-    int         ret;
-    germ_t     *germ = (germ_t *) arg;
-    pthread_t   tid  = pthread_self();
+    germ_t  *germ = (germ_t *) arg;
 
-    if (germ->tid) {
-        return (NULL);
-    }
+    /* Dead germs should have been reaped */
+    assert(germ->dead == false);
+    assert(germ->tid  == 0);
 
-    germ->tid = tid;
+    germ->tid = pthread_self();
 
-    printf("[*] START : 0x%lx\n", tid);
-    ret = germ->entry((void *) callback);
-    if (ret == 0) {
-        printf("[*] PASS\n");
+    printf("[*] START 0x%lx\n", germ->tid);
+
+    if (germ->entry((void *) callback) == 0) {
         germ->tid = 0;
+
+        printf("[*] PASS\n");
     }
 
     return (NULL);
