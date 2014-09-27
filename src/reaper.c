@@ -30,7 +30,7 @@ reaper_signal(int signo)
 
     printf("[!] Caught signal %d : 0x%lx\n", signo, tid);
 
-    reap(tid);
+    mark_dead(tid);
 
     pthread_exit(0);
 }

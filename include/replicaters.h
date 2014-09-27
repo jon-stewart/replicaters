@@ -8,9 +8,6 @@
 #include <list.h>
 #include <pthread.h>
 
-#define VAT_SIZE            (1 << 9)
-#define GERM_CODE           ("/tmp/output.sc")
-
 #define RW_INIT(rw) \
     pthread_rwlock_init((rw), NULL)
 
@@ -32,6 +29,9 @@
 #define MTX_EXIT(mtx)   \
     pthread_mutex_unlock((mtx))
 
+#define VAT_SIZE            (1 << 9)
+#define GERM_CODE           ("/tmp/output.sc")
+
 typedef struct germ {
     list_t         ls;
 
@@ -50,7 +50,7 @@ void *vat_base_address(void);
 void vat_scum_add(void *);
 void vat_scum_release(void);
 void stir(void);
-void reap(pthread_t);
+void mark_dead(pthread_t);
 
 /* germ.c */
 void foam(void);

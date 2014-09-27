@@ -151,7 +151,7 @@ stir(void)
 }
 
 void
-reap(pthread_t tid)
+mark_dead(pthread_t tid)
 {
     list_t *ptr  = NULL;
     germ_t *germ = NULL;
