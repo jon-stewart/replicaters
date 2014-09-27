@@ -11,6 +11,27 @@
 #define VAT_SIZE            (1 << 9)
 #define GERM_CODE           ("/tmp/output.sc")
 
+#define RW_INIT(rw) \
+    pthread_rwlock_init((rw), NULL)
+
+#define RW_WRLOCK(rw)   \
+    pthread_rwlock_wrlock((rw))
+
+#define RW_RDLOCK(rw)   \
+    pthread_rwlock_rdlock((rw))
+
+#define RW_UNLOCK(rw)   \
+    pthread_rwlock_unlock((rw))
+
+#define MTX_INIT(mtx)   \
+    pthread_mutex_init((mtx), NULL)
+
+#define MTX_ENTER(mtx)  \
+    pthread_mutex_lock((mtx))
+
+#define MTX_EXIT(mtx)   \
+    pthread_mutex_unlock((mtx))
+
 typedef struct germ {
     list_t         ls;
 

@@ -20,10 +20,10 @@ vat_init(void)
     assert(vat.pool != NULL);
 
     list_init(&vat.scum);
-    pthread_rwlock_init(&vat.scum_rw, NULL);
+    RW_INIT(&vat.scum_rw);
 
     list_init(&vat.fresh);
-    pthread_mutex_init(&vat.fresh_mtx, NULL);
+    MTX_INIT(&vat.fresh_mtx);
 }
 
 void
@@ -58,11 +58,11 @@ vat_scum_add(void *addr)
     germ->dead       = false;
     germ->tid        = 0;
 
-    pthread_mutex_lock(&vat.fresh_mtx);
+    MTX_ENTER(&vat.fresh_mtx);
 
     list_add(&vat.fresh, &germ->ls);
 
-    pthread_mutex_unlock(&vat.fresh_mtx);
+    MTX_EXIT(&vat.fresh_mtx);
 }
 
 void
@@ -70,7 +70,7 @@ vat_scum_release(void)
 {
     germ_t     *germ = NULL;
 
-    pthread_rwlock_wrlock(&vat.scum_rw);
+    RW_WRLOCK(&vat.scum_rw);
 
     while (!list_empty(&vat.scum)) {
         germ = (germ_t *) list_rm_back(&vat.scum);
@@ -79,7 +79,7 @@ vat_scum_release(void)
         free(germ);
     }
 
-    pthread_rwlock_unlock(&vat.scum_rw);
+    RW_UNLOCK(&vat.scum_rw);
 }
 
 /*
@@ -94,12 +94,12 @@ froth(void)
     int         ret;
 
 
-    pthread_rwlock_rdlock(&vat.scum_rw);
+    RW_RDLOCK(&vat.scum_rw);
 
     for_each_list_ele(&vat.scum, ptr) {
         germ = (germ_t *) ptr;
 
-        printf("[*] spawning\n", germ);
+        printf("[*] spawning\n");
 
         ret = pthread_create(&thd, NULL, spawn, (void *) germ);
         if (ret) {
@@ -109,7 +109,7 @@ froth(void)
         }
     }
 
-    pthread_rwlock_unlock(&vat.scum_rw);
+    RW_UNLOCK(&vat.scum_rw);
 
     printf("[*] Froth finish\n");
 }
@@ -125,7 +125,7 @@ stir(void)
     list_t *nxt  = NULL;
 
 
-    pthread_rwlock_wrlock(&vat.scum_rw);
+    RW_WRLOCK(&vat.scum_rw);
 
     /* Reap the dead */
     for_each_list_ele_safe(&vat.scum, nxt, ptr) {
@@ -137,7 +137,7 @@ stir(void)
         }
     }
 
-    pthread_mutex_lock(&vat.fresh_mtx);
+    MTX_ENTER(&vat.fresh_mtx);
 
     while (!list_empty(&vat.fresh)) {
         germ = (germ_t *) list_rm_front(&vat.fresh);
@@ -145,9 +145,9 @@ stir(void)
         list_add(&vat.scum, &germ->ls); 
     }
 
-    pthread_mutex_unlock(&vat.fresh_mtx);
+    MTX_EXIT(&vat.fresh_mtx);
 
-    pthread_rwlock_unlock(&vat.scum_rw);
+    RW_UNLOCK(&vat.scum_rw);
 }
 
 void
@@ -156,7 +156,7 @@ reap(pthread_t tid)
     list_t *ptr  = NULL;
     germ_t *germ = NULL;
 
-    pthread_rwlock_rdlock(&vat.scum_rw);
+    RW_RDLOCK(&vat.scum_rw);
 
     for_each_list_ele(&vat.scum, ptr) {
         germ = (germ_t *) ptr;
@@ -166,5 +166,5 @@ reap(pthread_t tid)
         }
     }
 
-    pthread_rwlock_unlock(&vat.scum_rw);
+    RW_UNLOCK(&vat.scum_rw);
 }
