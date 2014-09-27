@@ -36,9 +36,6 @@ delta:
     sub         r15, delta          ; our start address
     mov         [rbp-0x8], r15      ; store start address
 
-    mov         rax, 0x3949495969769
-    mov         rbx, [rax]
-
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
 
