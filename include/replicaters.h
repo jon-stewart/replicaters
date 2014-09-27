@@ -29,6 +29,7 @@ void vat_scum_add(void *);
 void vat_scum_release(void);
 
 /* germ.c */
+void foam(void);
 void froth(void);
 void infect(void);
 void *spawn(void *);

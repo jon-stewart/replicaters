@@ -106,10 +106,10 @@ froth(void)
         ret = pthread_create(&thd, NULL, spawn, (void *) germ);
         if (ret) {
             fprintf(stderr, "errors : %d\n", ret);
+        } else {
+            pthread_join(thd, NULL);
         }
     }
-
-    pthread_join(thd, NULL);
 
     pthread_mutex_unlock(&vat.scum.mtx);
 
@@ -122,5 +122,31 @@ froth(void)
 void
 foam(void)
 {
-    
+    list_t  transition;
+    germ_t *germ;
+
+    list_init(&transition);
+
+    pthread_mutex_lock(&vat.germinate.mtx);
+
+    while (!list_empty(&vat.germinate.list)) {
+        germ = (germ_t *) list_rm_front(&vat.germinate.list);
+        assert(germ != NULL);
+
+        list_add(&transition, &germ->ls);
+    }
+
+    pthread_mutex_unlock(&vat.germinate.mtx);
+
+
+    pthread_mutex_lock(&vat.scum.mtx);
+
+    while (!list_empty(&transition)) {
+        germ = (germ_t *) list_rm_front(&transition);
+        assert(germ != NULL);
+
+        list_add(&vat.scum.list, &germ->ls);
+    }
+
+    pthread_mutex_unlock(&vat.scum.mtx);
 }
