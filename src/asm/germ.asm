@@ -25,7 +25,7 @@ _start:
     sub         rsp, 0x18
     ; stack frame:
     ;   - 0x8  start address
-    ;   - 0x10 cb address
+    ;   - 0x10 reg_cb address
     ;   - 0x18 copy address
 
     call        delta
@@ -33,25 +33,35 @@ delta:
     pop         r15
     sub         r15, delta          ; our start address
     mov         [rbp-0x8], r15      ; store start address
-    mov         [rbp-0x10], rdi     ; store cb address
+    mov         [rbp-0x10], rdi     ; store reg_cb address
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
 
+    ; carry out the search for free space to replicate into
     call        search
+
+    ; if no free space found we exit out without the copy
+    test        rax, rax
+    jz          complete
+
+    ; store the copy dest address
     mov         [rbp-0x18], rax
 
-    mov         rdi, [rbp-0x18]
+    ; carry out the copy of this germ
     call        copy
 
-    ; print completion message
-    _print      0x8, comp_str, comp_str_len
+    ; print copy message
+    _print      0x8, cpy_str, cpy_str_len
 
-    ; make call to the callback
+    ; make call to the registration cb
     mov         rdi, [rbp-0x18]     ; arg0: address
     mov         rsi, germ_len       ; arg1: length
-    call        [rbp-0x10]          ; cb address
+    call        [rbp-0x10]          ; reg_cb address
 
+complete:
+    ; print completion message
+    _print      0x8, comp_str, comp_str_len
 
 exit:
     ; epilog - stack frame cleanup
@@ -62,12 +72,12 @@ exit:
 
 ;------------------------------------------------------------------------------
 ; print:
-;       use the linux write syscall to output text string to stdout
+;   use the linux write syscall to output text string to stdout
 ; in:
-;       rcx-address of string
-;       rdx-string length
+;   rcx-address of string
+;   rdx-string length
 ; returns:
-;       rax-#bytes written
+;   rax-#bytes written
 ;
 print:
     xor         rax, rax
@@ -78,38 +88,47 @@ print:
 
 ;------------------------------------------------------------------------------
 ; search:
-;       now begin to search for enough free space
+;   now begin to search for enough free space
 ; in:
 ; returns:
-;       rax-address found
+;   rax-address found
 ;
 search:
     xor         rax, rax
     mov         rdi, [rbp-0x8]      ; start address
     add         rdi, germ_len       ; move pointer to beyond end
-.find_null:
     xor         rcx, rcx
     add         rcx, reach          ; area in which we can replicate
+.find_null:
     repne       scasw               ; repeat scasw as long as [rdi] is not NULL (rax)
 
     ; exit if we out of reach (rcx zero)
     test        rcx, rcx
-    jz          .exit
+    jz          .fail
 
-    ; temporarily store the copy start address
+    ; hold the copy dest address
     mov         r12, rdi
 
+    ; hold the remaining reach
+    mov         r13, rcx
+
 .find_space:
+    ; find enough free space for replication
     xor         rcx, rcx
     add         rcx, germ_len
     repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
 
     ; if rcx is not zero we do not have enough space
     test        rcx, rcx
-    jnz         .find_null
+    mov         rcx, r13            ; remaining reach
+    jnz         .find_null          ; restart search
 
-    ; return the copy start address
+    ; return the copy dest address
     mov         rax, r12
+    jmp         .exit
+
+.fail:
+    xor         rax, rax
 .exit:
     ret
 
@@ -117,13 +136,14 @@ search:
 ; copy:
 ;
 ; in:
-;       rdi-start address
+;   rdi-start address
 ; returns:
 ;
 copy:
+    mov         rdi, [rbp-0x18]     ; copy dest address
     mov         rsi, [rbp-0x8]      ; germ start address
-    mov         rcx, germ_len
-    rep         movsb
+    mov         rcx, germ_len       ; copy length
+    rep         movsb               ; copy those bytes
     ret
 
 ;------------------------------------------------------------------------------
@@ -148,6 +168,9 @@ failure:
 ;
 exe_str:        db "[x] germ executing",10,0
 exe_str_len:    equ $-exe_str
+
+cpy_str:        db "[x] copied",10,0
+cpy_str_len:    equ $-cpy_str
 
 comp_str:       db "[x] complete",10,0
 comp_str_len:   equ $-comp_str

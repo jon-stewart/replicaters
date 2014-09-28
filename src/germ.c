@@ -2,9 +2,9 @@
 #include <string.h>
 
 static void
-callback(void *addr, unsigned long long length)
+reg_cb(void *addr, unsigned long long length)
 {
-    printf("[*] callback : %p, 0x%llx\n", addr, length);
+    printf("[*] cb: %p, 0x%llx\n", addr, length);
 
     assert(addr != NULL);
     assert(length > 0);
@@ -23,12 +23,12 @@ spawn(void *arg)
 
     germ->tid = pthread_self();
 
-    printf("[*] START tid:0x%lx\n", germ->tid);
+    printf("[*] START %p\n", germ->entry);
 
-    if (germ->entry((void *) callback) == 0) {
+    if (germ->entry((void *) reg_cb) == 0) {
         germ->tid = 0;
 
-        printf("[*] PASS\n");
+        printf("[*] PASS %p\n", germ->entry);
     }
 
     return (NULL);

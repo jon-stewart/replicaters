@@ -21,7 +21,7 @@ vat_init(void)
 
     memset(vat.pool, 0, VAT_SIZE);
 
-    printf("vat - s:%p, e:%p\n", vat.pool, vat.pool + VAT_SIZE);
+    // printf("vat - s:%p, e:%p\n", vat.pool, vat.pool + VAT_SIZE);
 
     list_init(&vat.scum);
     RW_INIT(&vat.scum_rw);
@@ -68,7 +68,7 @@ vat_scum_add(void *addr)
 
     MTX_EXIT(&vat.fresh_mtx);
 
-    printf("[%s] Added germ : %p\n", __FUNCTION__, germ->entry);
+    // printf("[%s] Added germ : %p\n", __FUNCTION__, germ->entry);
 }
 
 void
@@ -99,13 +99,15 @@ froth(void)
     pthread_t   thd;
     int         ret;
 
+    printf("---------------------------------------------------------------\n");
+    printf("[*] Froth begins\n");
 
     RW_RDLOCK(&vat.scum_rw);
 
     for_each_list_ele(&vat.scum, ptr) {
         germ = (germ_t *) ptr;
 
-        printf("[*] Spawning : %p\n", germ->entry);
+        // printf("[*] Spawning : %p\n", germ->entry);
 
         ret = pthread_create(&thd, NULL, spawn, (void *) germ);
         if (ret) {
