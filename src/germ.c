@@ -2,9 +2,9 @@
 #include <string.h>
 
 static void
-callback(void *addr, unsigned length)
+callback(void *addr, unsigned long long length)
 {
-    printf("[*] callback : %p, 0x%x\n", addr, length);
+    printf("[*] callback : %p, 0x%llx\n", addr, length);
 
     assert(addr != NULL);
     assert(length > 0);
