@@ -26,15 +26,18 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x8
+    sub         rsp, 0x10
     ; stack frame:
-    ;   - 0x8 start address
+    ;   - 0x8  start address
+    ;   - 0x10 cb address
 
     call        delta
 delta:
     pop         r15
     sub         r15, delta          ; our start address
     mov         [rbp-0x8], r15      ; store start address
+
+    mov         [rbp-0x10], rdi     ; store cb address
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
@@ -45,6 +48,13 @@ delta:
 
     ; print completion message
     _print      0x8, comp_str, comp_str_len
+
+
+    ; make call to the callback
+    mov         rax, [rbp-0x10]     ; cb address
+    mov         rdi, 0x12345        ; arg0: addr
+    mov         rsi, 0x54321        ; arg1: length
+    call        rax
 
 exit:
     ; epilog - stack frame cleanup
