@@ -4,7 +4,10 @@
 static void
 callback(void *addr, unsigned length)
 {
-    printf("[*] callback : %p, %x\n", addr, length);
+    printf("[*] callback : %p, 0x%x\n", addr, length);
+
+    assert(addr != NULL);
+    assert(length > 0);
 }
 
 void *

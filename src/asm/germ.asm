@@ -8,10 +8,6 @@
 ; Description:
 ;   Code which will scan for free space in memory and copy itself into it.
 ;
-;   This must be encoded in x86 assembly as nasm x64 will not resolve labels
-;   if used as memory addresses.
-;
-;
 [section .text]
 
 [BITS 64]
