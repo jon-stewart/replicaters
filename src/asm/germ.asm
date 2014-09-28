@@ -88,7 +88,8 @@ print:
 
 ;------------------------------------------------------------------------------
 ; search:
-;   now begin to search for enough free space
+;   look for enough free space to replicate into.  We can only search as far
+;   as our 'reach' will allow.
 ; in:
 ; returns:
 ;   rax-address found
@@ -181,7 +182,7 @@ fail_str_len:   equ $-fail_str
 ;------------------------------------------------------------------------------
 ; germ info
 ;
-stack_sz:       equ 0ffh
+stack_sz:       equ 020h
 reach:          equ 080h
 
 germ_len:       equ end-_start
