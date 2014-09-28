@@ -8,6 +8,8 @@ callback(void *addr, unsigned long long length)
 
     assert(addr != NULL);
     assert(length > 0);
+
+    vat_scum_add(addr);
 }
 
 void *
@@ -21,7 +23,7 @@ spawn(void *arg)
 
     germ->tid = pthread_self();
 
-    printf("[*] START 0x%lx\n", germ->tid);
+    printf("[*] START tid:0x%lx\n", germ->tid);
 
     if (germ->entry((void *) callback) == 0) {
         germ->tid = 0;

@@ -12,8 +12,8 @@ main(int argc, char **argv)
     stir();
     froth();
 
-//    stir();
-//    froth();
+    stir();
+    froth();
 
     vat_destroy();
 

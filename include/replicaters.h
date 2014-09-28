@@ -29,7 +29,7 @@
 #define MTX_EXIT(mtx)   \
     pthread_mutex_unlock((mtx))
 
-#define VAT_SIZE            (1 << 9)
+#define VAT_SIZE            (1 << 12)
 #define GERM_CODE           ("/tmp/output.sc")
 
 typedef struct germ {
