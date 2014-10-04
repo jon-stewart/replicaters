@@ -124,7 +124,12 @@ froth(void)
 }
 
 /*
- * Add fresh germs to the scum
+ * Function:
+ *      stir
+ *
+ * Description:
+ *      Post processing of spawn step.  Reap any dead germ and add any
+ *      newly replicated germ to the scum list.
  */
 void
 stir(void)
@@ -158,6 +163,13 @@ stir(void)
     RW_UNLOCK(&vat.scum_rw);
 }
 
+/*
+ * Function:
+ *      mark_dead
+ *
+ * Description:
+ *      Find germ to mark as dead, this will be reaped in the next stir call.
+ */
 void
 mark_dead(pthread_t tid)
 {

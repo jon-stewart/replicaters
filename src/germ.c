@@ -1,6 +1,15 @@
 #include <replicaters.h>
 #include <string.h>
 
+/*
+ * Function:
+ *      reg_cb
+ *
+ * Description:
+ *      Registration callback from germs after successful replication.
+ *
+ *      Add to scum list for future spawning.
+ */
 static void
 reg_cb(void *addr, size_t length)
 {
@@ -12,6 +21,13 @@ reg_cb(void *addr, size_t length)
     vat_scum_add(addr, length);
 }
 
+/*
+ * Function:
+ *      spawn
+ *
+ * Description:
+ *      Thread function for passing execution to germ code in vat pool memory.
+ */
 void *
 spawn(void *arg)
 {
@@ -34,6 +50,14 @@ spawn(void *arg)
     return (NULL);
 }
 
+/*
+ * Function:
+ *      infect
+ *
+ * Description:
+ *      Read the extracted germ binary .text section and write to start of the
+ *      vat memory pool.
+ */
 void
 infect(void)
 {
