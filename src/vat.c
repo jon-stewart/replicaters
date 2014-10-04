@@ -1,5 +1,7 @@
 #include <replicaters.h>
 #include <string.h>
+#include <termios.h>
+#include <unistd.h>
 
 typedef struct vat {
     void *pool;
@@ -93,6 +95,19 @@ vat_scum_release(void)
     RW_UNLOCK(&vat.scum_rw);
 }
 
+static void
+mygetch(void)
+{
+  struct termios old, new;
+
+  tcgetattr(STDIN_FILENO, &old);
+  new = old;
+  new.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &new);
+  getchar();
+  tcsetattr(STDIN_FILENO, TCSANOW, &old);
+}
+
 /*
  * Froth up the scum and get the germs spawning
  */
@@ -126,6 +141,9 @@ froth(void)
     RW_UNLOCK(&vat.scum_rw);
 
     printf("[*] Froth finish\n");
+
+    printf("[*] Enter to continue to next generation\n>");
+    mygetch();
 }
 
 /*
