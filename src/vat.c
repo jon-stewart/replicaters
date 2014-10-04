@@ -48,7 +48,7 @@ vat_base_address(void)
 }
 
 void
-vat_scum_add(void *addr)
+vat_scum_add(void *addr, size_t length)
 {
     germ_t     *germ = NULL;
 
@@ -57,6 +57,7 @@ vat_scum_add(void *addr)
     assert(germ != NULL);
 
     germ->entry      = addr;
+    germ->len        = length;
     germ->magic      = 0;
     germ->generation = 1;
     germ->dead       = false;
@@ -140,8 +141,7 @@ stir(void)
         germ = (germ_t *) ptr;
 
         if (germ->dead == true) {
-            list_rm(&germ->ls);
-            free(germ);
+            reaper_cleanse(germ);
         }
     }
 

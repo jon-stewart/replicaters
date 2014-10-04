@@ -36,6 +36,7 @@ typedef struct germ {
     list_t         ls;
 
     unsigned (*entry)(void *);
+    size_t          len;
 
     unsigned int    magic;
     int             generation;
@@ -47,7 +48,7 @@ typedef struct germ {
 void vat_init(void);
 void vat_destroy(void);
 void *vat_base_address(void);
-void vat_scum_add(void *);
+void vat_scum_add(void *, size_t);
 void vat_scum_release(void);
 void stir(void);
 void mark_dead(pthread_t);
@@ -60,5 +61,6 @@ void *spawn(void *);
 
 /* reaper.c */
 void reaper_init(void);
+void reaper_cleanse(germ_t *);
 
 #endif /* _REPNMEM_H_ */

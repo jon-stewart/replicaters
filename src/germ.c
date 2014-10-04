@@ -2,14 +2,14 @@
 #include <string.h>
 
 static void
-reg_cb(void *addr, unsigned long long length)
+reg_cb(void *addr, size_t length)
 {
-    printf("[*] cb: %p, 0x%llx\n", addr, length);
+    printf("[*] cb: %p, 0x%lx\n", addr, (unsigned long) length);
 
     assert(addr != NULL);
     assert(length > 0);
 
-    vat_scum_add(addr);
+    vat_scum_add(addr, length);
 }
 
 void *
@@ -40,7 +40,7 @@ infect(void)
     FILE       *file    = NULL;
     char       *buffer  = NULL;
     void       *addr    = NULL;
-    unsigned    len     = 0;
+    size_t      len     = 0;
 
 
     file = fopen(GERM_CODE, "rb");
@@ -63,5 +63,5 @@ infect(void)
 
     free(buffer);
 
-    vat_scum_add(addr);
+    vat_scum_add(addr, len);
 }
