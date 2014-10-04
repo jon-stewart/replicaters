@@ -33,13 +33,14 @@
 #define GERM_CODE           ("/tmp/output.sc")
 
 typedef struct germ {
-    list_t         ls;
+    unsigned        magic;
+#define GERM_MAGIC  (0xC0FFEE)
+    list_t          ls;
 
     unsigned (*entry)(void *);
     size_t          len;
 
-    unsigned int    magic;
-    int             generation;
+    unsigned int    generation;
     bool            dead;
     pthread_t       tid;
 } germ_t;

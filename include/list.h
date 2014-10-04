@@ -21,11 +21,14 @@ list_t *list_rm_front(list_t *);
 
 void list_rm(list_t *);
 
-#define for_each_list_ele(head, ptr) \
+#define LIST_FOR_EACH(head, ptr) \
     for ((ptr) = (head)->next; (ptr) != (head); (ptr) = (ptr)->next)
 
-#define for_each_list_ele_safe(head, n, ptr) \
-    for (ptr = (head)->next, n = ptr->next; ptr != (head); ptr = n, n = ptr->next)
+#define LIST_FOR_EACH_SAFE(head, nxt, ptr) \
+    for (ptr = (head)->next, nxt = ptr->next; ptr != (head); ptr = nxt, nxt = ptr->next)
+
+#define LIST_ENTRY(ptr, type, name) \
+    (type *) ((char *)ptr - ((size_t)&((type *)0)->name))
 
 static inline int
 list_empty(list_t *list)

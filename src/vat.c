@@ -56,9 +56,9 @@ vat_scum_add(void *addr, size_t length)
     germ = malloc(sizeof (*germ));
     assert(germ != NULL);
 
+    germ->magic      = GERM_MAGIC;
     germ->entry      = addr;
     germ->len        = length;
-    germ->magic      = 0;
     germ->generation = 1;
     germ->dead       = false;
     germ->tid        = 0;
@@ -69,19 +69,22 @@ vat_scum_add(void *addr, size_t length)
 
     MTX_EXIT(&vat.fresh_mtx);
 
-    // printf("[%s] Added germ : %p\n", __FUNCTION__, germ->entry);
+    printf("[%s] Added germ : %p\n", __FUNCTION__, germ->entry);
 }
 
 void
 vat_scum_release(void)
 {
     germ_t     *germ = NULL;
+    list_t     *ptr  = NULL;
 
     RW_WRLOCK(&vat.scum_rw);
 
     while (!list_empty(&vat.scum)) {
-        germ = (germ_t *) list_rm_back(&vat.scum);
-        assert(germ != NULL);
+        ptr = list_rm_back(&vat.scum);
+        assert(ptr != NULL);
+        germ = LIST_ENTRY(ptr, germ_t, ls);
+        assert(germ->magic == GERM_MAGIC);
 
         free(germ);
     }
@@ -105,8 +108,9 @@ froth(void)
 
     RW_RDLOCK(&vat.scum_rw);
 
-    for_each_list_ele(&vat.scum, ptr) {
-        germ = (germ_t *) ptr;
+    LIST_FOR_EACH(&vat.scum, ptr) {
+        germ = LIST_ENTRY(ptr, germ_t, ls);
+        assert(germ->magic == GERM_MAGIC);
 
         // printf("[*] Spawning : %p\n", germ->entry);
 
@@ -142,8 +146,9 @@ stir(void)
     RW_WRLOCK(&vat.scum_rw);
 
     /* Reap the dead */
-    for_each_list_ele_safe(&vat.scum, nxt, ptr) {
-        germ = (germ_t *) ptr;
+    LIST_FOR_EACH_SAFE(&vat.scum, nxt, ptr) {
+        germ = LIST_ENTRY(ptr, germ_t, ls);
+        assert(germ->magic == GERM_MAGIC);
 
         if (germ->dead == true) {
             reaper_cleanse(germ);
@@ -153,7 +158,10 @@ stir(void)
     MTX_ENTER(&vat.fresh_mtx);
 
     while (!list_empty(&vat.fresh)) {
-        germ = (germ_t *) list_rm_front(&vat.fresh);
+        ptr = list_rm_front(&vat.fresh);
+        assert(ptr != NULL);
+        germ = LIST_ENTRY(ptr, germ_t, ls);
+        assert(germ->magic == GERM_MAGIC);
 
         list_add(&vat.scum, &germ->ls); 
     }
@@ -178,8 +186,9 @@ mark_dead(pthread_t tid)
 
     RW_RDLOCK(&vat.scum_rw);
 
-    for_each_list_ele(&vat.scum, ptr) {
-        germ = (germ_t *) ptr;
+    LIST_FOR_EACH(&vat.scum, ptr) {
+        germ = LIST_ENTRY(ptr, germ_t, ls);
+        assert(germ->magic == GERM_MAGIC);
 
         if (germ->tid == tid) {
             germ->dead = true;
