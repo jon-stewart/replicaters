@@ -22,11 +22,12 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x18
+    sub         rsp, 0x20
     ; stack frame:
     ;   - 0x8  start address
     ;   - 0x10 reg_cb address
-    ;   - 0x18 copy address
+    ;   - 0x18 generation
+    ;   - 0x20 copy address
 
     call        delta
 delta:
@@ -34,6 +35,7 @@ delta:
     sub         r15, delta          ; our start address
     mov         [rbp-0x8], r15      ; store start address
     mov         [rbp-0x10], rdi     ; store reg_cb address
+    mov         [rbp-0x18], rsi     ; store generation
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
@@ -46,7 +48,7 @@ delta:
     jz          complete
 
     ; store the copy dest address
-    mov         [rbp-0x18], rax
+    mov         [rbp-0x20], rax
 
     ; carry out the copy of this germ
     call        copy
@@ -55,8 +57,10 @@ delta:
     _print      0x8, cpy_str, cpy_str_len
 
     ; make call to the registration cb
-    mov         rdi, [rbp-0x18]     ; arg0: address
+    mov         rdi, [rbp-0x20]     ; arg0: replicant address
     mov         rsi, germ_len       ; arg1: length
+    mov         rdx, [rbp-0x18]     ; arg2: gen
+    inc         rdx
     call        [rbp-0x10]          ; reg_cb address
 
 complete:
@@ -141,7 +145,8 @@ search:
 ; returns:
 ;
 copy:
-    mov         rdi, [rbp-0x18]     ; copy dest address
+    ; XXX source of bugs, have own stack frame
+    mov         rdi, [rbp-0x20]     ; copy dest address
     mov         rsi, [rbp-0x8]      ; germ start address
     mov         rcx, germ_len       ; copy length
     rep         movsb               ; copy those bytes
@@ -182,8 +187,8 @@ fail_str_len:   equ $-fail_str
 ;------------------------------------------------------------------------------
 ; germ info
 ;
-stack_sz:       equ 020h
-reach:          equ 080h
+stack_sz:       db 020h
+reach:          db 080h
 
 germ_len:       equ end-_start
 end:

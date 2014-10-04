@@ -11,14 +11,14 @@
  *      Add to scum list for future spawning.
  */
 static void
-reg_cb(void *addr, size_t length)
+reg_cb(void *addr, size_t len, unsigned gen)
 {
-    printf("[*] cb: %p, 0x%lx\n", addr, (unsigned long) length);
+    printf("[*] cb: %p, 0x%lx, %u\n", addr, (unsigned long) len, gen);
 
     assert(addr != NULL);
-    assert(length > 0);
+    assert(len > 0);
 
-    vat_scum_add(addr, length);
+    vat_scum_add(addr, len, gen);
 }
 
 /*
@@ -41,7 +41,7 @@ spawn(void *arg)
 
     printf("[*] START %p\n", germ->entry);
 
-    if (germ->entry((void *) reg_cb) == 0) {
+    if (germ->entry((void *) reg_cb, germ->generation) == 0) {
         germ->tid = 0;
 
         printf("[*] PASS %p\n", germ->entry);
@@ -87,5 +87,5 @@ infect(void)
 
     free(buffer);
 
-    vat_scum_add(addr, len);
+    vat_scum_add(addr, len, 0);
 }

@@ -48,7 +48,7 @@ vat_base_address(void)
 }
 
 void
-vat_scum_add(void *addr, size_t length)
+vat_scum_add(void *addr, size_t len, unsigned gen)
 {
     germ_t     *germ = NULL;
 
@@ -58,8 +58,8 @@ vat_scum_add(void *addr, size_t length)
 
     germ->magic      = GERM_MAGIC;
     germ->entry      = addr;
-    germ->len        = length;
-    germ->generation = 1;
+    germ->len        = len;
+    germ->generation = gen;
     germ->dead       = false;
     germ->tid        = 0;
 
@@ -69,7 +69,8 @@ vat_scum_add(void *addr, size_t length)
 
     MTX_EXIT(&vat.fresh_mtx);
 
-    printf("[%s] Added germ : %p\n", __FUNCTION__, germ->entry);
+    printf("[%s] Added germ: %p, gen: %u\n", __FUNCTION__,
+            germ->entry, germ->generation);
 }
 
 void

@@ -37,7 +37,7 @@ typedef struct germ {
 #define GERM_MAGIC  (0xC0FFEE)
     list_t          ls;
 
-    unsigned (*entry)(void *);
+    unsigned (*entry)(void *, unsigned);
     size_t          len;
 
     unsigned int    generation;
@@ -49,7 +49,7 @@ typedef struct germ {
 void vat_init(void);
 void vat_destroy(void);
 void *vat_base_address(void);
-void vat_scum_add(void *, size_t);
+void vat_scum_add(void *, size_t, unsigned);
 void vat_scum_release(void);
 void stir(void);
 void mark_dead(pthread_t);
