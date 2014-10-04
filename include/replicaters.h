@@ -8,6 +8,14 @@
 #include <list.h>
 #include <pthread.h>
 
+//#define DEV
+#ifdef DEV
+#define debug(format, ...) \
+    printf(format, ##__VA_ARGS__)
+#else
+#define debug(format, ...)
+#endif
+
 #define RW_INIT(rw) \
     pthread_rwlock_init((rw), NULL)
 

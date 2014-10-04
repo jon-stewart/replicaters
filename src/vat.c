@@ -71,7 +71,7 @@ vat_scum_add(void *addr, size_t len, unsigned gen)
 
     MTX_EXIT(&vat.fresh_mtx);
 
-    printf("[%s] Added germ: %p, gen: %u\n", __FUNCTION__,
+    debug("[%s] Added germ: %p, gen: %u\n", __FUNCTION__,
             germ->entry, germ->generation);
 }
 
@@ -119,8 +119,8 @@ froth(void)
     pthread_t   thd;
     int         ret;
 
-    printf("---------------------------------------------------------------\n");
-    printf("[*] Froth begins\n");
+    debug("---------------------------------------------------------------\n");
+    debug("[*] Froth begins\n");
 
     RW_RDLOCK(&vat.scum_rw);
 
@@ -140,9 +140,9 @@ froth(void)
 
     RW_UNLOCK(&vat.scum_rw);
 
-    printf("[*] Froth finish\n");
+    debug("[*] Froth finish\n");
 
-    printf("[*] Enter to continue to next generation\n>");
+    printf(">\n");
     mygetch();
 }
 

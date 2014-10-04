@@ -13,7 +13,7 @@
 static void
 reg_cb(void *addr, size_t len, unsigned gen)
 {
-    printf("[*] cb: %p, 0x%lx, %u\n", addr, (unsigned long) len, gen);
+    debug("[*] cb: %p, 0x%lx, %u\n", addr, (unsigned long) len, gen);
 
     assert(addr != NULL);
     assert(len > 0);
@@ -39,12 +39,12 @@ spawn(void *arg)
 
     germ->tid = pthread_self();
 
-    printf("[*] START %p\n", germ->entry);
+    debug("[*] START %p\n", germ->entry);
 
     if (germ->entry((void *) reg_cb, germ->generation) == 0) {
         germ->tid = 0;
 
-        printf("[*] PASS %p\n", germ->entry);
+        debug("[*] PASS %p\n", germ->entry);
     }
 
     return (NULL);
