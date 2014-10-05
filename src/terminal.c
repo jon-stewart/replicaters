@@ -77,7 +77,7 @@ terminal_print_scum(list_t *scum)
         for (j = 0; j < column; ++j) {
 
             if ((germ != NULL) && ((((unsigned long long) germ->entry) - base_addr) / min) == j) {
-                printf("%d", germ->generation);
+                printf("\033[31m%d\033[0m", germ->generation);
 
                 if (germ->ls.next != scum) {
                     germ = LIST_ENTRY(germ->ls.next, germ_t, ls);
