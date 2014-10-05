@@ -72,4 +72,8 @@ void *spawn(void *);
 void reaper_init(void);
 void reaper_cleanse(germ_t *);
 
+/* terminal.c */
+void terminal_key_input(void);
+void terminal_print_scum(list_t *);
+
 #endif /* _REPNMEM_H_ */
