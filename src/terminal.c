@@ -37,7 +37,6 @@ terminal_print_scum(list_t *scum)
     unsigned            row       = 0;
     unsigned            blocks    = 0;
     int                 i, j;
-    list_t              sorted;
 
     /* Get terminal size */
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
@@ -46,9 +45,9 @@ terminal_print_scum(list_t *scum)
     column = ((w.ws_col % 2) ? w.ws_col - 1 : w.ws_col);
     column -= 4;
 
-    printf("column: %u | pool_size: %u\n", column, VAT_SIZE);
+    base_addr = (unsigned long long) vat_base_address();
 
-    /* Find smallest germ length and lowest entry address */
+    /* Find smallest germ length */
     LIST_FOR_EACH(scum, ptr) {
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
@@ -56,18 +55,16 @@ terminal_print_scum(list_t *scum)
         if (germ->len < min) {
             min = germ->len;
         }
-
-        if (((unsigned long long) germ->entry) < base_addr) {
-            base_addr = (unsigned long long) germ->entry;
-        }
     }
 
     blocks = VAT_SIZE / min;
     row = blocks / column;
 
     printf("smallest block size: %u (bytes) | #blocks in table: %u | row: %u\n",
-            min, blocks, row);
-    printf("base address: %p\n", (void *) base_addr);
+            (unsigned) min, blocks, row);
+
+    germ = LIST_ENTRY(scum->next, germ_t, ls);
+    assert(germ->magic == GERM_MAGIC);
 
     /* Print the table of scum */
     printf("  ");
@@ -78,6 +75,18 @@ terminal_print_scum(list_t *scum)
     for (i = 0; i < row; ++i) {
         printf(" |");
         for (j = 0; j < column; ++j) {
+
+            if ((germ != NULL) && ((((unsigned long long) germ->entry) - base_addr) / min) == j) {
+                printf("%d", germ->generation);
+
+                if (germ->ls.next != scum) {
+                    germ = LIST_ENTRY(germ->ls.next, germ_t, ls);
+                    assert(germ->magic == GERM_MAGIC);
+                } else {
+                    germ = NULL;
+                }
+            }
+
             printf(" ");
         }
         printf("|\n");

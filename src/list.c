@@ -107,17 +107,23 @@ list_add_sorted(list_t *head, list_t *list, sort_fn func)
 
     LIST_FOR_EACH(head, ptr) {
         loc = func(ptr, list);
-        if (loc == -1) {
-            /* Less than */
-            list_insert(prev, list, ptr);
-            break;
-        } else if (loc == 0) {
-            /* Equal to */
-            list_insert(prev, list, ptr);
-            break;
-        } else if (loc == +1) {
-            /* Greater than */
-            prev = ptr;
+        switch (loc) {
+            case -1: {
+                list_insert(prev, list, ptr);
+                return;
+            }
+            case 0: {
+                list_insert(prev, list, ptr);
+                return;
+            }
+            case 1: {
+                prev = ptr;
+                break;
+            }
+            default: {
+                assert(0);
+            }
         }
     }
+    list_insert(prev, list, head);
 }

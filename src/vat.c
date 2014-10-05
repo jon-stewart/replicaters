@@ -133,18 +133,18 @@ froth(void)
 static int
 sort(list_t *a, list_t *b)
 {
-    germ_t *germ_a = LIST_ENTRY(a, germ_t, ls);
-    germ_t *germ_b = LIST_ENTRY(b, germ_t, ls);
-    int     ret    = 0;
+    germ_t *old = LIST_ENTRY(a, germ_t, ls);
+    germ_t *new = LIST_ENTRY(b, germ_t, ls);
+    int     ret = 0;
 
-    assert(germ_a->magic == GERM_MAGIC);
-    assert(germ_b->magic == GERM_MAGIC);
+    assert(old->magic == GERM_MAGIC);
+    assert(new->magic == GERM_MAGIC);
 
-    if (germ_a->entry < germ_b->entry) {
+    if (new->entry < old->entry) {
         ret = -1;
-    } else if (germ_a->entry == germ_b->entry) {
+    } else if (new->entry == old->entry) {
         ret = 0;
-    } else if (germ_a->entry > germ_b->entry) {
+    } else if (new->entry > old->entry) {
         ret = +1;
     }
 
@@ -190,6 +190,7 @@ stir(void)
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
 
+        printf("adding : %p - %p\n", germ, germ->entry);
         list_add_sorted(&vat.scum, &germ->ls, sort);
     }
 
