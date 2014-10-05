@@ -130,6 +130,30 @@ froth(void)
     terminal_key_input();
 }
 
+static int
+sort(list_t *a, list_t *b)
+{
+    germ_t *germ_a = LIST_ENTRY(a, germ_t, ls);
+    germ_t *germ_b = LIST_ENTRY(b, germ_t, ls);
+    int     ret    = 0;
+
+    assert(germ_a->magic == GERM_MAGIC);
+    assert(germ_b->magic == GERM_MAGIC);
+
+    if (germ_a->entry < germ_b->entry) {
+        ret = -1;
+    } else if (germ_a->entry == germ_b->entry) {
+        ret = 0;
+    } else if (germ_a->entry > germ_b->entry) {
+        ret = +1;
+    }
+
+    /* Catch duplicate entry points */
+    assert(ret != 0);
+
+    return (ret);
+}
+
 /*
  * Function:
  *      stir
@@ -166,7 +190,7 @@ stir(void)
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
 
-        list_add(&vat.scum, &germ->ls); 
+        list_add_sorted(&vat.scum, &germ->ls, sort);
     }
 
     MTX_EXIT(&vat.fresh_mtx);

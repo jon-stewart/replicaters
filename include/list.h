@@ -36,4 +36,8 @@ list_empty(list_t *list)
     return (list->next == list);
 }
 
+typedef int (*sort_fn)(list_t *, list_t *);
+
+void list_add_sorted(list_t *, list_t *, sort_fn);
+
 #endif
