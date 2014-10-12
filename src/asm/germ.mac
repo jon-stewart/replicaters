@@ -11,6 +11,7 @@
 ;       print
 ;
 %macro _print 3
+%ifdef DEBUG
     mov         rdx, [rbp-%1]       ; start address
     lea         rsi, [rdx+%2]       ; string address
     xor         rdx, rdx
@@ -18,4 +19,5 @@
     call        print
     cmp         rax, rdx            ; compare #bytes written to string length
     jne         failure             ; goto fail if any issues
+%endif
 %endmacro
