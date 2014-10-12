@@ -6,6 +6,10 @@ c_opts += -ggdb
 c_opts += -lpthread
 c_opts += -z execstack
 
+ifeq (${DEBUG}, 1)
+	c_opts += -DDEBUG
+endif
+
 src := $(wildcard src/*.c)
 
 $target:

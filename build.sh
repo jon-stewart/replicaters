@@ -1,19 +1,21 @@
 #!/bin/sh
 
-make clean
-
-make
-
-debug=""
+nasm_debug=""
+c_debug=""
 if [ -n $1 ]
 then
     if [ "$1" == "debug" ]
     then
-        debug="-DDEBUG"
+        nasm_debug="-DDEBUG"
+        c_debug="DEBUG=1"
     fi
 fi
 
-nasm -f elf64 -o /tmp/germ.o -I src/asm/ src/asm/germ.asm $debug
+make clean
+
+make $c_debug
+
+nasm -f elf64 -o /tmp/germ.o -I src/asm/ src/asm/germ.asm $nasm_debug
 
 ld -Ttext 0 -o /tmp/germ /tmp/germ.o
 

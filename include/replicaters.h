@@ -8,8 +8,7 @@
 #include <list.h>
 #include <pthread.h>
 
-//#define DEV
-#ifdef DEV
+#ifdef DEBUG
 #define debug(format, ...) \
     printf(format, ##__VA_ARGS__)
 #else
