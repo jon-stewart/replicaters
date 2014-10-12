@@ -24,6 +24,10 @@ terminal_key_input(void)
  *
  * fflush(stdout);
  * printf("\b%c", char);
+ *
+ * XXX function is mess, fix this!
+ *
+ * XXX # shows the location of germ, colour represents generation band.
  */
 void
 terminal_print_scum(list_t *scum)
@@ -66,6 +70,9 @@ terminal_print_scum(list_t *scum)
     germ = LIST_ENTRY(scum->next, germ_t, ls);
     assert(germ->magic == GERM_MAGIC);
 
+    printf("\033[31mRED: 0x\033[0m\n");
+    printf("\033[32mBLUE: 1x\033[0m\n");
+
     /* Print the table of scum */
     printf("  ");
     for (i = 0; i < column; ++i) {
@@ -77,7 +84,11 @@ terminal_print_scum(list_t *scum)
         for (j = 0; j < column; ++j) {
 
             if ((germ != NULL) && ((((unsigned long long) germ->entry) - base_addr) / min) == j) {
-                printf("\033[31m%d\033[0m", germ->generation);
+                if (germ->generation < 10) {
+                    printf("\033[31m#\033[0m");
+                } else {
+                    printf("\033[32m#\033[0m");
+                }
 
                 if (germ->ls.next != scum) {
                     germ = LIST_ENTRY(germ->ls.next, germ_t, ls);
@@ -85,9 +96,9 @@ terminal_print_scum(list_t *scum)
                 } else {
                     germ = NULL;
                 }
+            } else {
+                printf(" ");
             }
-
-            printf(" ");
         }
         printf("|\n");
     }
