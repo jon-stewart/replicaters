@@ -33,7 +33,7 @@ _start:
 delta:
     pop         r15
     sub         r15, delta          ; our start address
-    mov         [rbp-0x8], r15      ; store start address
+    mov         [rbp-0x08], r15     ; store start address
     mov         [rbp-0x10], rdi     ; store reg_cb address
     mov         [rbp-0x18], rsi     ; store generation
 
@@ -51,7 +51,10 @@ delta:
     mov         [rbp-0x20], rax
 
     ; carry out the copy of this germ
-    call        copy
+    mov         rdi, [rbp-0x20]     ; copy dest address
+    mov         rsi, [rbp-0x08]     ; germ start address
+    mov         rcx, germ_len       ; copy length
+    rep         movsb               ; copy those bytes
 
     ; print copy message
     _print      0x8, cpy_str, cpy_str_len
@@ -135,21 +138,6 @@ search:
 .fail:
     xor         rax, rax
 .exit:
-    ret
-
-;------------------------------------------------------------------------------
-; copy:
-;
-; in:
-;   rdi-start address
-; returns:
-;
-copy:
-    ; XXX source of bugs, have own stack frame
-    mov         rdi, [rbp-0x20]     ; copy dest address
-    mov         rsi, [rbp-0x8]      ; germ start address
-    mov         rcx, germ_len       ; copy length
-    rep         movsb               ; copy those bytes
     ret
 
 ;------------------------------------------------------------------------------
