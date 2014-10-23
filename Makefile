@@ -5,6 +5,7 @@ c_opts += -I include/
 c_opts += -ggdb
 c_opts += -lpthread
 c_opts += -z execstack
+c_opts += -masm=intel
 
 ifeq (${DEBUG}, 1)
 	c_opts += -DDEBUG

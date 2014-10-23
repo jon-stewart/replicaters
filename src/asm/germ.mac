@@ -33,3 +33,25 @@
     add         r10, %2             ; variable address
     mov         %3, [r10]
 %endmacro
+
+%macro debug 0
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rdi
+    push rsi
+    push r9
+    push r8
+
+    call [rbp-0x20]
+
+    pop r8
+    pop r9
+    pop rsi
+    pop rdi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+%endmacro

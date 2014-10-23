@@ -22,11 +22,12 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x18
+    sub         rsp, 0x20
     ; stack frame:
     ;   - 0x8  start address
     ;   - 0x10 reg_cb address
     ;   - 0x18 copy address
+    ;   - 0x20 debug_cb address
 
     call        delta
 delta:
@@ -34,12 +35,15 @@ delta:
     sub         r15, delta          ; our start address
     mov         [rbp-0x08], r15     ; store start address
     mov         [rbp-0x10], rdi     ; store reg_cb address
+    mov         [rbp-0x20], rsi     ; store debug_cb address
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
 
     ; carry out the search for free space to replicate into
     call        search
+
+    debug
 
     ; if no free space found we exit out without the copy
     test        rax, rax
