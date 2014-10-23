@@ -36,10 +36,12 @@
 
 ;------------------------------------------------------------------------------
 ; _debug:
-;
+;       save all registers and then make the call to the debug callback
+;       function.
 ; in:
 ;       1-debug function address
 %macro _debug 1
+%ifdef DEBUG
     push rax
     push rbx
     push rcx
@@ -59,4 +61,5 @@
     pop rcx
     pop rbx
     pop rax
+%endif
 %endmacro

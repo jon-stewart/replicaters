@@ -14,10 +14,12 @@
 
 %include "germ.mac"
 
-%define SADDR       [rbp-0x8]
-%define REG_CB      [rbp-0x10]
-%define DADDR       [rbp-0x18]
-%define DEBUG_CB    [rbp-0x20]
+; stack frame defs.
+%define SADDR       [rbp-0x8]       ; germ start address
+%define REG_CB      [rbp-0x10]      ; registration cb address
+%define DADDR       [rbp-0x18]      ; destination copy address
+%define DEBUG_CB    [rbp-0x20]      ; debug cb address
+%define SFRAME      0x20
 
 global _start
 
@@ -27,12 +29,7 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x20
-    ; stack frame:
-    ;   - 0x8  start address
-    ;   - 0x10 reg_cb address
-    ;   - 0x18 copy address
-    ;   - 0x20 debug_cb address
+    sub         rsp, SFRAME
 
     call        delta
 delta:
