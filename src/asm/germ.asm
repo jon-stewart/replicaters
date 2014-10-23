@@ -58,6 +58,11 @@ delta:
     _get_var    SADDR, germ_len, cx
     rep         movsb               ; copy those bytes
 
+    ; set generation number in replicant
+    _get_var    SADDR, gen, al      ; get our generation number
+    inc         al                  ; increment it
+    _set_var    DADDR, gen, al      ; store in replicant
+
     ; print copy message
     _print      SADDR, cpy_str, cpy_str_len
 
