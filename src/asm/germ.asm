@@ -55,7 +55,7 @@ delta:
     ; carry out the copy of this germ
     mov         rdi, [rbp-0x18]     ; copy dest address
     mov         rsi, [rbp-0x08]     ; germ start address
-    mov         rcx, germ_len       ; copy length
+    _get_var    0x8, germ_len, cx
     rep         movsb               ; copy those bytes
 
     ; print copy message
@@ -65,8 +65,7 @@ delta:
     xor         rsi, rsi
     xor         rdx, rdx
     mov         rdi, [rbp-0x18]     ; arg0: replicant address
-    mov         rsi, germ_len
-;    _get_var    0x08, germ_len, si  ; arg1: length
+    _get_var    0x08, germ_len, si  ; arg1: length
     _get_var    0x08, gen, dl       ; arg2: generation
     call        [rbp-0x10]          ; reg_cb address
 
@@ -108,9 +107,8 @@ print:
 search:
     xor         rax, rax
     xor         rdi, rdi
-    mov         rdi, [rbp-0x8]      ; start address
-    add         rdi, germ_len       ; move pointer to beyond end
-;    _get_var    0x8, germ_len, di
+    _get_var    0x8, germ_len, di
+    add         rdi, [rbp-0x8]
     xor         rcx, rcx
     _get_var    0x8, reach, cx
 .find_null:
@@ -186,5 +184,5 @@ reach:          dw 0FFh             ; how many bytes we can search
 gen:            db  01h             ; generation
 life:           db  05h
 
-germ_len:       equ end-_start       ; size of germ
+germ_len:       dw end-_start       ; size of germ
 end:
