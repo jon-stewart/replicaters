@@ -54,6 +54,8 @@
 ;       function.
 ; in:
 ;       1-debug function address
+;
+; TODO: this is likely overkill, only need to save rdi, rsi, rdx, rcx
 %macro _debug 1
 %ifdef DEBUG
     push rax
