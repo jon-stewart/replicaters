@@ -30,6 +30,6 @@
 ;
 %macro _get_var 3
     mov         r10, [rbp-%1]       ; start address
-    add         r10, %2             ; variable offset
+    add         r10, %2             ; variable address
     mov         %3, [r10]
 %endmacro

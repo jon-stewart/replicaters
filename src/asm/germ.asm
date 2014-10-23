@@ -104,11 +104,11 @@ print:
 search:
     xor         rax, rax
     xor         rdi, rdi
-    xor         rcx, rcx
     mov         rdi, [rbp-0x8]      ; start address
     add         rdi, germ_len       ; move pointer to beyond end
 ;    _get_var    0x8, germ_len, di
-    _get_var    0x8, reach, cl
+    xor         rcx, rcx
+    _get_var    0x8, reach, cx
 .find_null:
     repne       scasw               ; repeat scasw as long as [rdi] is not NULL (rax)
 
@@ -125,7 +125,7 @@ search:
 .find_space:
     ; find enough free space for replication
     xor         rcx, rcx
-    _get_var    0x8, reach, cl
+    _get_var    0x8, reach, cx
     repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
 
     ; if rcx is not zero we do not have enough space
