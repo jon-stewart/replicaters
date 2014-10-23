@@ -14,6 +14,11 @@
 
 %include "germ.mac"
 
+%define SADDR       [rbp-0x8]
+%define REG_CB      [rbp-0x10]
+%define DADDR       [rbp-0x18]
+%define DEBUG_CB    [rbp-0x20]
+
 global _start
 
 _start:
@@ -33,45 +38,43 @@ _start:
 delta:
     pop         r15
     sub         r15, delta          ; our start address
-    mov         [rbp-0x08], r15     ; store start address
-    mov         [rbp-0x10], rdi     ; store reg_cb address
-    mov         [rbp-0x20], rsi     ; store debug_cb address
+    mov         SADDR, r15          ; store start address
+    mov         REG_CB, rdi         ; store reg_cb address
+    mov         DEBUG_CB, rsi       ; store debug_cb address
 
     ; print out the begin execution message
-    _print      0x8, exe_str, exe_str_len
+    _print      SADDR, exe_str, exe_str_len
 
     ; carry out the search for free space to replicate into
     call        search
-
-    debug
 
     ; if no free space found we exit out without the copy
     test        rax, rax
     jz          complete
 
     ; store the copy dest address
-    mov         [rbp-0x18], rax
+    mov         DADDR, rax
 
     ; carry out the copy of this germ
-    mov         rdi, [rbp-0x18]     ; copy dest address
-    mov         rsi, [rbp-0x08]     ; germ start address
-    _get_var    0x8, germ_len, cx
+    mov         rdi, DADDR          ; copy dest address
+    mov         rsi, SADDR          ; germ start address
+    _get_var    SADDR, germ_len, cx
     rep         movsb               ; copy those bytes
 
     ; print copy message
-    _print      0x8, cpy_str, cpy_str_len
+    _print      SADDR, cpy_str, cpy_str_len
 
     ; make call to the registration cb
     xor         rsi, rsi
     xor         rdx, rdx
-    mov         rdi, [rbp-0x18]     ; arg0: replicant address
-    _get_var    0x08, germ_len, si  ; arg1: length
-    _get_var    0x08, gen, dl       ; arg2: generation
-    call        [rbp-0x10]          ; reg_cb address
+    mov         rdi, DADDR          ; arg0: replicant address
+    _get_var    SADDR, germ_len, si ; arg1: length
+    _get_var    SADDR, gen, dl      ; arg2: generation
+    call        REG_CB              ; reg_cb address
 
 complete:
     ; print completion message
-    _print      0x8, comp_str, comp_str_len
+    _print      SADDR, comp_str, comp_str_len
 
 exit:
     ; epilog - stack frame cleanup
@@ -107,10 +110,10 @@ print:
 search:
     xor         rax, rax
     xor         rdi, rdi
-    _get_var    0x8, germ_len, di
-    add         rdi, [rbp-0x8]
+    _get_var    SADDR, germ_len, di
+    add         rdi, SADDR
     xor         rcx, rcx
-    _get_var    0x8, reach, cx
+    _get_var    SADDR, reach, cx
 .find_null:
     repne       scasw               ; repeat scasw as long as [rdi] is not NULL (rax)
 
@@ -127,7 +130,7 @@ search:
 .find_space:
     ; find enough free space for replication
     xor         rcx, rcx
-    _get_var    0x8, reach, cx
+    _get_var    SADDR, reach, cx
     repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
 
     ; if rcx is not zero we do not have enough space
@@ -152,7 +155,7 @@ search:
 ;
 failure:
     ; print out failure message
-    _print      0x8, fail_str, fail_str_len
+    _print      SADDR, fail_str, fail_str_len
 
     mov         rbx, 0xDEADBEEF
     mov         rax, 0x1
@@ -164,6 +167,7 @@ failure:
 ;------------------------------------------------------------------------------
 ; debug string
 ;
+%ifdef DEBUG
 exe_str:        db "[x] germ executing",10,0
 exe_str_len:    equ $-exe_str
 
@@ -175,6 +179,7 @@ comp_str_len:   equ $-comp_str
 
 fail_str:       db "[x] failure",10,0
 fail_str_len:   equ $-fail_str
+%endif
 
 ;------------------------------------------------------------------------------
 ; germ info
