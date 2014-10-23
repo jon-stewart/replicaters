@@ -108,9 +108,7 @@ search:
     mov         rdi, [rbp-0x8]      ; start address
     add         rdi, germ_len       ; move pointer to beyond end
 ;    _get_var    0x8, germ_len, di
-;    _get_var    0x8, reach, cl
-    xor         rcx, rcx
-    add         rcx, reach          ; area in which we can replicate
+    _get_var    0x8, reach, cl
 .find_null:
     repne       scasw               ; repeat scasw as long as [rdi] is not NULL (rax)
 
@@ -127,8 +125,7 @@ search:
 .find_space:
     ; find enough free space for replication
     xor         rcx, rcx
-    mov         rcx, reach
-;    _get_var    0x8, reach, cl
+    _get_var    0x8, reach, cl
     repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
 
     ; if rcx is not zero we do not have enough space
