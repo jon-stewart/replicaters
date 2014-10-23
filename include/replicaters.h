@@ -44,7 +44,7 @@ typedef struct germ {
 #define GERM_MAGIC  (0xC0FFEE)
     list_t          ls;
 
-    unsigned (*entry)(void *, unsigned);
+    unsigned (*entry)(void *);
     size_t          len;
 
     unsigned int    generation;

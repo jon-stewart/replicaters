@@ -190,7 +190,8 @@ stir(void)
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
 
-        printf("adding : %p - %p\n", germ, germ->entry);
+        printf("adding : %p - %p | %d\n",
+                germ, germ->entry, germ->generation);
         list_add_sorted(&vat.scum, &germ->ls, sort);
     }
 

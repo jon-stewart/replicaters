@@ -5,8 +5,6 @@
 ;       1-start address
 ;       2-string offset
 ;       3-string length
-; returns:
-;       n/a
 ; calls:
 ;       print
 ;
@@ -20,4 +18,18 @@
     cmp         rax, rdx            ; compare #bytes written to string length
     jne         failure             ; goto fail if any issues
 %endif
+%endmacro
+
+;------------------------------------------------------------------------------
+; _get_var:
+;       calculate variable address and access it
+; in:
+;       1-start address
+;       2-variable offset
+;       3-register out
+;
+%macro _get_var 3
+    mov         r10, [rbp-%1]       ; start address
+    add         r10, %2             ; variable offset
+    mov         %3, [r10]
 %endmacro

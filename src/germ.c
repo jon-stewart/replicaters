@@ -11,9 +11,9 @@
  *      Add to scum list for future spawning.
  */
 static void
-reg_cb(void *addr, size_t len, unsigned gen)
+reg_cb(void *addr, size_t len, unsigned long gen)
 {
-    debug("[*] cb: %p, 0x%lx, %u\n", addr, (unsigned long) len, gen);
+    printf("[*] cb: %p, 0x%lx, 0x%lx\n", addr, (unsigned long) len, gen);
 
     assert(addr != NULL);
     assert(len > 0);
@@ -41,7 +41,7 @@ spawn(void *arg)
 
     debug("[*] START %p\n", germ->entry);
 
-    if (germ->entry((void *) reg_cb, germ->generation) == 0) {
+    if (germ->entry((void *) reg_cb) == 0) {
         germ->tid = 0;
 
         debug("[*] PASS %p\n", germ->entry);

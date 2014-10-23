@@ -42,6 +42,8 @@ terminal_print_scum(list_t *scum)
     unsigned            blocks    = 0;
     int                 i, j;
 
+    return;
+
     /* Get terminal size */
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 

@@ -22,12 +22,11 @@ _start:
     ; prolog - stack frame creation
     push        rbp
     mov         rbp, rsp
-    sub         rsp, 0x20
+    sub         rsp, 0x18
     ; stack frame:
     ;   - 0x8  start address
     ;   - 0x10 reg_cb address
-    ;   - 0x18 generation
-    ;   - 0x20 copy address
+    ;   - 0x18 copy address
 
     call        delta
 delta:
@@ -35,7 +34,6 @@ delta:
     sub         r15, delta          ; our start address
     mov         [rbp-0x08], r15     ; store start address
     mov         [rbp-0x10], rdi     ; store reg_cb address
-    mov         [rbp-0x18], rsi     ; store generation
 
     ; print out the begin execution message
     _print      0x8, exe_str, exe_str_len
@@ -48,10 +46,10 @@ delta:
     jz          complete
 
     ; store the copy dest address
-    mov         [rbp-0x20], rax
+    mov         [rbp-0x18], rax
 
     ; carry out the copy of this germ
-    mov         rdi, [rbp-0x20]     ; copy dest address
+    mov         rdi, [rbp-0x18]     ; copy dest address
     mov         rsi, [rbp-0x08]     ; germ start address
     mov         rcx, germ_len       ; copy length
     rep         movsb               ; copy those bytes
@@ -60,10 +58,12 @@ delta:
     _print      0x8, cpy_str, cpy_str_len
 
     ; make call to the registration cb
-    mov         rdi, [rbp-0x20]     ; arg0: replicant address
-    mov         rsi, germ_len       ; arg1: length
-    mov         rdx, [rbp-0x18]     ; arg2: gen
-    inc         rdx
+    xor         rsi, rsi
+    xor         rdx, rdx
+    mov         rdi, [rbp-0x18]     ; arg0: replicant address
+    mov         rsi, germ_len
+;    _get_var    0x08, germ_len, si  ; arg1: length
+    _get_var    0x08, gen, dl       ; arg2: generation
     call        [rbp-0x10]          ; reg_cb address
 
 complete:
@@ -103,8 +103,12 @@ print:
 ;
 search:
     xor         rax, rax
+    xor         rdi, rdi
+    xor         rcx, rcx
     mov         rdi, [rbp-0x8]      ; start address
     add         rdi, germ_len       ; move pointer to beyond end
+;    _get_var    0x8, germ_len, di
+;    _get_var    0x8, reach, cl
     xor         rcx, rcx
     add         rcx, reach          ; area in which we can replicate
 .find_null:
@@ -123,7 +127,8 @@ search:
 .find_space:
     ; find enough free space for replication
     xor         rcx, rcx
-    add         rcx, germ_len
+    mov         rcx, reach
+;    _get_var    0x8, reach, cl
     repe        scasw               ; repeat scasw as long as [rdi] is NULL (rax)
 
     ; if rcx is not zero we do not have enough space
@@ -176,7 +181,9 @@ fail_str_len:   equ $-fail_str
 ; germ info
 ;
 stack_sz:       db 020h
-reach:          db 080h
+reach:          dw 0FFh             ; how many bytes we can search
+gen:            db  01h             ; generation
+life:           db  05h
 
-germ_len:       equ end-_start
+germ_len:       equ end-_start       ; size of germ
 end:
