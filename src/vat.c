@@ -105,15 +105,13 @@ froth(void)
     int         ret;
 
     debug("---------------------------------------------------------------\n");
-    debug("[*] Froth begins\n");
+    debug("[%s] begin\n", __FUNCTION__);
 
     RW_RDLOCK(&vat.scum_rw);
 
     LIST_FOR_EACH(&vat.scum, ptr) {
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
-
-        // printf("[*] Spawning : %p\n", germ->entry);
 
         ret = pthread_create(&thd, NULL, spawn, (void *) germ);
         if (ret) {
@@ -125,7 +123,7 @@ froth(void)
 
     RW_UNLOCK(&vat.scum_rw);
 
-    debug("[*] Froth finish\n");
+    debug("[%s] finish\n", __FUNCTION__);
 
     terminal_key_input();
 }
@@ -190,7 +188,7 @@ stir(void)
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
 
-        printf("adding : %p - %p | %d\n",
+        debug("adding : %p - %p | %d\n",
                 germ, germ->entry, germ->generation);
         list_add_sorted(&vat.scum, &germ->ls, sort);
     }
