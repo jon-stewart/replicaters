@@ -37,7 +37,7 @@
     pthread_mutex_unlock((mtx))
 
 #define VAT_SIZE            (1024 * 1024)
-#define GERM_CODE           ("/tmp/output.sc")
+#define GERM_CODE           ("/tmp/germ.sc")
 
 typedef struct germ {
     unsigned        magic;
