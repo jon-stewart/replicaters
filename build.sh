@@ -19,4 +19,4 @@ nasm -f elf64 -o /tmp/germ.o -I src/asm/ src/asm/germ.asm $nasm_debug
 
 ld -Ttext 0 -o /tmp/germ /tmp/germ.o
 
-python ../binextract/binextract.py -s /tmp/germ
+python ../binextract/binextract.py -f /tmp/germ -s germ-text
