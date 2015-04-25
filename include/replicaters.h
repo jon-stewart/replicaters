@@ -38,6 +38,7 @@
 
 #define VAT_SIZE            (1024 * 1024)
 #define GERM_CODE           ("/tmp/germ.sc")
+#define GERM_FD             ("/germfd")
 
 typedef struct germ {
     unsigned        magic;

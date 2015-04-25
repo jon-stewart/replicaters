@@ -1,7 +1,11 @@
 #include <replicaters.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 typedef struct vat {
+    int   fd;
     void *pool;
 
     list_t scum;
@@ -16,12 +20,15 @@ static vat_t vat;
 void
 vat_init(void)
 {
-    vat.pool = malloc(VAT_SIZE);
-    assert(vat.pool != NULL);
+    vat.fd = shm_open(GERM_FD, (O_RDWR | O_CREAT), S_IRWXU);
+    assert(vat.fd != -1);
+
+    ftruncate(vat.fd, VAT_SIZE);
+
+    vat.pool = mmap (0, VAT_SIZE, (PROT_READ | PROT_WRITE | PROT_EXEC), MAP_SHARED, vat.fd, 0);
+    assert(vat.pool != MAP_FAILED);
 
     memset(vat.pool, 0, VAT_SIZE);
-
-    // printf("vat - s:%p, e:%p\n", vat.pool, vat.pool + VAT_SIZE);
 
     list_init(&vat.scum);
     RW_INIT(&vat.scum_rw);
@@ -36,7 +43,9 @@ vat_destroy(void)
     vat_scum_release();
 
     assert(vat.pool != NULL);
-    free(vat.pool);
+    munmap(vat.pool, VAT_SIZE);
+
+    shm_unlink(GERM_FD);
 }
 
 void *
