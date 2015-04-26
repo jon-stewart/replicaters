@@ -134,7 +134,9 @@ froth(void)
 
     debug("[%s] finish\n", __FUNCTION__);
 
-    terminal_key_input();
+    if (dev) {
+        terminal_key_input();
+    }
 }
 
 static int
@@ -197,14 +199,11 @@ stir(void)
         germ = LIST_ENTRY(ptr, germ_t, ls);
         assert(germ->magic == GERM_MAGIC);
 
-        debug("adding : %p - %p | %d\n",
-                germ, germ->entry, germ->generation);
+        debug("adding : %p - %p | %d\n", germ, germ->entry, germ->generation);
         list_add_sorted(&vat.scum, &germ->ls, sort);
     }
 
     MTX_EXIT(&vat.fresh_mtx);
-
-    terminal_print_scum(&vat.scum);
 
     RW_UNLOCK(&vat.scum_rw);
 }

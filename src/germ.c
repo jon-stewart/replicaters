@@ -13,7 +13,7 @@
 static void
 reg_cb(void *addr, size_t len, unsigned long gen)
 {
-    debug("[*] cb: %p, 0x%lx, 0x%lx\n", addr, (unsigned long) len, gen);
+    debug("[%s] germ:%p, len:0x%lx, gen:0x%lx\n", __FUNCTION__, addr, (unsigned long) len, gen);
 
     assert(addr != NULL);
     assert(len > 0);
@@ -21,6 +21,15 @@ reg_cb(void *addr, size_t len, unsigned long gen)
     vat_scum_add(addr, len, gen);
 }
 
+/*
+ * Function:
+ *      debug_cb
+ *
+ * Description:
+ *      Address of this function is passed as argument to germs.  If/when
+ *      called from the germ this func will print out the interesting
+ *      registers.
+ */
 static void
 debug_cb(void)
 {
@@ -72,12 +81,12 @@ spawn(void *arg)
 
     germ->tid = pthread_self();
 
-    debug("[*] START %p\n", germ->entry);
+    debug("[%s] entry:%p\n", __FUNCTION__, germ->entry);
 
     if (germ->entry((void *) reg_cb, (void *) debug_cb) == 0) {
         germ->tid = 0;
 
-        debug("[*] PASS %p\n", germ->entry);
+        debug("[%s] exit:%p\n", __FUNCTION__, germ->entry);
     }
 
     return (NULL);

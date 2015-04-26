@@ -9,9 +9,11 @@
 #include <pthread.h>
 
 #ifdef DEBUG
+#define dev (true)
 #define debug(format, ...) \
     printf(format, ##__VA_ARGS__)
 #else
+#define dev (false)
 #define debug(format, ...)
 #endif
 
