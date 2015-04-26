@@ -18,7 +18,7 @@ typedef struct vat {
 static vat_t vat;
 
 void
-vat_init(void)
+vat_init_shared(void)
 {
     vat.fd = shm_open(GERM_FD, (O_RDWR | O_CREAT), S_IRWXU);
     assert(vat.fd != -1);
@@ -27,6 +27,20 @@ vat_init(void)
 
     vat.pool = mmap (0, VAT_SIZE, (PROT_READ | PROT_WRITE | PROT_EXEC), MAP_SHARED, vat.fd, 0);
     assert(vat.pool != MAP_FAILED);
+}
+
+void
+vat_init_private(void)
+{
+    vat.fd   = -1;
+    vat.pool = malloc(VAT_SIZE);
+    assert(vat.pool != NULL);
+}
+
+void
+vat_init(void)
+{
+    vat_init_private();
 
     memset(vat.pool, 0, VAT_SIZE);
 

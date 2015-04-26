@@ -24,6 +24,9 @@
 global _start
 
 _start:
+    nop                             ; 4 nop sled can be the germ start identifier for now
+    nop
+    nop
     nop
     
     ; prolog - stack frame creation
@@ -192,4 +195,5 @@ gen:            db  01h             ; generation
 life:           db  05h
 
 germ_len:       dw end-_start       ; size of germ
+end_tag:        db "GERM"
 end:

